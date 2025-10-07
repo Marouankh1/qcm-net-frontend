@@ -1,10 +1,10 @@
-import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import useAuthStore from '@/stores/authStore';
+import { Navigate } from 'react-router';
 
 export const ProtectedRoute = ({ element }) => {
-    let auth = { token: false };
+    const { isAuthenticated } = useAuthStore();
 
-    if (!auth) {
+    if (!isAuthenticated) {
         return (
             <Navigate
                 to="/login"

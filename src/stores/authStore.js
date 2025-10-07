@@ -1,4 +1,3 @@
-import api from '@/services/api';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -8,85 +7,35 @@ const useAuthStore = create(
             user: null,
             isAuthenticated: false,
             isLoading: false,
-
-            login: async (credentials) => {
-                try {
-                    set({ isLoading: true });
-
-                    const response = await api.post('/login', credentials);
-
-                    set({
-                        user: response.data.data.user,
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-
-                    return { success: true, user: response.data.data.user };
-                } catch (error) {
-                    set({ isLoading: false });
-                    return {
-                        success: false,
-                        error: error.response?.data?.message || 'Login failed',
-                    };
-                }
+            login: (userData) => {
+                set({
+                    user: userData,
+                    isAuthenticated: true,
+                    error: null,
+                });
             },
-
-            register: async (userData) => {
-                try {
-                    set({ isLoading: true });
-                    const response = await api.post('/api/register', userData);
-
-                    set({
-                        user: response.data.data.user,
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-
-                    return { success: true, user: response.data.data.user };
-                } catch (error) {
-                    set({ isLoading: false });
-                    return {
-                        success: false,
-                        error: error.response?.data?.message || 'Registration failed',
-                    };
-                }
+            logout: () => {
+                set({
+                    user: null,
+                    isAuthenticated: false,
+                    error: null,
+                });
             },
-
-            logout: async () => {
-                try {
-                    await api.post('/api/logout');
-                } catch (error) {
-                    console.error('Logout error:', error);
-                } finally {
-                    set({ user: null, isAuthenticated: false, isLoading: false });
-                }
+            setLoading: (loading) => set({ isLoading: loading }),
+            setError: (error) => set({ error }),
+            setDefault: () => set({ user: null, isAuthenticated: false, isLoading: false }),
+            clearError: () => set({ error: null }),
+            getUserRole: () => {
+                const { user } = get();
+                return user?.role || null;
             },
-
-            checkAuth: async () => {
-                try {
-                    set({ isLoading: true });
-                    const response = await api.get('/api/user');
-
-                    set({
-                        user: response.data.data.user,
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-                } catch (error) {
-                    set({
-                        user: null,
-                        isAuthenticated: false,
-                        isLoading: false,
-                    });
-                }
-            },
-
-            clearError: () => {
-                // Clear any auth errors
+            hasRole: (role) => {
+                const { user } = get();
+                return user?.role === role;
             },
         }),
         {
-            name: 'auth-storage',
+            name: 'AuthStore',
             partialize: (state) => ({
                 user: state.user,
                 isAuthenticated: state.isAuthenticated,

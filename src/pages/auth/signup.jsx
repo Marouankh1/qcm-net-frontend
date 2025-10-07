@@ -1,22 +1,15 @@
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import FormLogin from './components/form-login';
-import { currentYear } from '@/utils/current-year';
+import { SignupForm } from '@/pages/auth/components/signup-form';
 import LogoApp from '@/components/ui/logo-app';
-import { Toaster } from '@/components/ui/sonner';
+import { currentYear } from '@/utils/current-year';
 import useAuthStore from '@/stores/authStore';
+import { Toaster } from '@/components/ui/sonner';
 import { Navigate } from 'react-router';
 
-export function Login({ className, ...props }) {
+function Signup({ className, ...props }) {
     const { isAuthenticated } = useAuthStore();
-
-    // Redirect if user is already logged in
-    // useEffect(() => {
-    //     if (user) {
-    //         const redirectPath = user.role === 'teacher' ? '/teacher' : user.role === 'admin' ? '/admin' : '/student';
-    //         navigate(redirectPath, { replace: true });
-    //     }
-    // }, [user, navigate]);
 
     if (isAuthenticated) {
         return (
@@ -29,7 +22,7 @@ export function Login({ className, ...props }) {
 
     return (
         <>
-            <title>QCM NET - Login</title>
+            <title>QCM NET - Signup</title>
             <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
                 <Toaster
                     // closeButton={true}
@@ -44,12 +37,12 @@ export function Login({ className, ...props }) {
                         className={cn('flex flex-col gap-6', className)}
                         {...props}>
                         <Card>
-                            <CardHeader className="text-center">
-                                <CardTitle className="text-2xl">Welcome back</CardTitle>
-                                <CardDescription>Sign in to QCM Net platform</CardDescription>
+                            <CardHeader>
+                                <CardTitle>Create an account</CardTitle>
+                                <CardDescription>Enter your information below to create your account</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <FormLogin />
+                                <SignupForm />
                                 <div className="flex flex-col justify-center items-center mt-5">
                                     <span className="text-xs text-foreground/30">ENSI Tanger | QCM NET © {currentYear}</span>
                                 </div>
@@ -61,3 +54,5 @@ export function Login({ className, ...props }) {
         </>
     );
 }
+
+export default Signup;
