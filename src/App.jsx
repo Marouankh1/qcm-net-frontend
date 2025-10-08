@@ -19,28 +19,6 @@ import { toast } from 'sonner';
 // import { AppSidebar } from '@/components/app-sidebar';
 
 function App() {
-    const { logout, isLoading, setLoading, user, isAuthenticated } = useAuthStore();
-
-    const loginMutation = useLogout();
-    const navigate = useNavigate();
-
-    const handleLogOut = async () => {
-        try {
-            setLoading(true);
-            const result = await loginMutation.mutateAsync();
-            if (result.data.success) {
-                logout();
-                setLoading(false);
-                navigate('/login');
-                setTimeout(() => {
-                    toast.success(result.data.message);
-                }, 1000);
-            }
-        } catch (error) {
-            setLoading(false);
-        }
-    };
-
     return (
         <>
             <Toaster
@@ -50,12 +28,16 @@ function App() {
             />
             <SidebarProvider>
                 <AppSidebar />
-                <main>
-                    <SidebarTrigger />
+                <main className="w-full h-screen ">
                     <Outlet />
+                    {/* <Button
+                        className="cursor-pointer disabled:cursor-none"
+                        disabled={isLoading}
+                        onClick={() => handleLogOut()}>
+                        {isLoading ? 'Logout ...' : 'Logout'}
+                    </Button> */}
                 </main>
             </SidebarProvider>
-
             {/* <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset>
@@ -89,13 +71,6 @@ function App() {
                     </div>
                 </SidebarInset>
             </SidebarProvider> */}
-            {/* Welcome To QCM-NET Platform
-            <Button
-                className="cursor-pointer disabled:cursor-none"
-                disabled={isLoading}
-                onClick={() => handleLogOut()}>
-                {isLoading ? 'Logout ...' : 'Logout'}
-            </Button> */}
         </>
     );
 }

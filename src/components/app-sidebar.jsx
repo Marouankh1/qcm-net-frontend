@@ -3,140 +3,53 @@
 import * as React from 'react';
 import {
     AudioWaveform,
+    BarChart3,
     BookOpen,
     Bot,
     Command,
+    FilePlus2,
+    FileTextIcon,
     Frame,
     GalleryVerticalEnd,
+    LayoutDashboardIcon,
     Map,
     PieChart,
     Settings2,
     SquareTerminal,
 } from 'lucide-react';
-
 import { NavMain } from '@/components/nav-main';
-import { NavProjects } from '@/components/nav-projects';
 import { NavUser } from '@/components/nav-user';
 import { TeamSwitcher } from '@/components/team-switcher';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import LogoApp from '@/components/ui/logo-app';
 
-// This is sample data.
 const data = {
     user: {
-        name: 'shadcn',
-        email: 'm@example.com',
-        avatar: '/avatars/shadcn.jpg',
+        name: 'Teacher Name',
+        email: 'teacher@qcm-net.com',
+        avatar: '/avatars/teacher.jpg',
     },
-    // teams: [
-    //     {
-    //         name: 'QCM NET',
-    //         logo: GalleryVerticalEnd,
-    //         plan: 'Pal',
-    //     },
-    // ],
     navMain: [
         {
-            title: 'Playground',
-            url: '#',
-            icon: SquareTerminal,
+            title: 'Dashboard',
+            url: '/dashboard',
+            icon: LayoutDashboardIcon,
             isActive: true,
-            items: [
-                {
-                    title: 'History',
-                    url: '#',
-                },
-                {
-                    title: 'Starred',
-                    url: '#',
-                },
-                {
-                    title: 'Settings',
-                    url: '#',
-                },
-            ],
         },
         {
-            title: 'Models',
-            url: '#',
-            icon: Bot,
-            items: [
-                {
-                    title: 'Genesis',
-                    url: '#',
-                },
-                {
-                    title: 'Explorer',
-                    url: '#',
-                },
-                {
-                    title: 'Quantum',
-                    url: '#',
-                },
-            ],
+            title: 'Show Quizzes',
+            url: '/quizzes',
+            icon: FileTextIcon,
         },
         {
-            title: 'Documentation',
-            url: '#',
-            icon: BookOpen,
-            items: [
-                {
-                    title: 'Introduction',
-                    url: '#',
-                },
-                {
-                    title: 'Get Started',
-                    url: '#',
-                },
-                {
-                    title: 'Tutorials',
-                    url: '#',
-                },
-                {
-                    title: 'Changelog',
-                    url: '#',
-                },
-            ],
+            title: 'Create Quizzes',
+            url: '/quizzes/create',
+            icon: FilePlus2,
         },
         {
-            title: 'Settings',
-            url: '#',
-            icon: Settings2,
-            items: [
-                {
-                    title: 'General',
-                    url: '#',
-                },
-                {
-                    title: 'Team',
-                    url: '#',
-                },
-                {
-                    title: 'Billing',
-                    url: '#',
-                },
-                {
-                    title: 'Limits',
-                    url: '#',
-                },
-            ],
-        },
-    ],
-    projects: [
-        {
-            name: 'Design Engineering',
-            url: '#',
-            icon: Frame,
-        },
-        {
-            name: 'Sales & Marketing',
-            url: '#',
-            icon: PieChart,
-        },
-        {
-            name: 'Travel',
-            url: '#',
-            icon: Map,
+            title: 'Statistics',
+            url: '/statistics',
+            icon: BarChart3,
         },
     ],
 };
@@ -147,13 +60,15 @@ export function AppSidebar({ ...props }) {
             collapsible="icon"
             {...props}>
             <SidebarHeader>
-                <div className="inline-flex items-center justify-start gap-2">
-                    <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-                        <BookOpen className="w-4 h-4 text-primary-foreground" />
+                <div className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:px-0">
+                    {/* Logo icon - always visible */}
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary">
+                        <BookOpen className="size-4 text-primary-foreground" />
                     </div>
-                    <div className="flex flex-col justify-center">
-                        <h1 className="text-sm font-medium text-foreground">QCM-Net</h1>
-                        <span className="text-xs font-light">Plateform of quizzes</span>
+                    {/* Logo text - hidden when sidebar is collapsed */}
+                    <div className="flex flex-col justify-center group-data-[collapsible=icon]:hidden">
+                        <h1 className="text-sm font-medium text-sidebar-foreground">QCM-Net</h1>
+                        <span className="text-xs font-light text-sidebar-foreground/70">Plateform of quizzes</span>
                     </div>
                 </div>
 
@@ -161,7 +76,6 @@ export function AppSidebar({ ...props }) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
             </SidebarContent>
             <SidebarFooter>
                 <NavUser user={data.user} />
