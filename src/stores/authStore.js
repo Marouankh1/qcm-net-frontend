@@ -29,10 +29,19 @@ const useAuthStore = create(
                 const { user } = get();
                 return user?.role || null;
             },
+
             hasRole: (role) => {
                 const { user } = get();
                 return user?.role === role;
             },
+
+            hasAnyRole: (roles) => {
+                const { user } = get();
+                return roles.includes(user?.role);
+            },
+            isAdmin: () => get().hasRole('admin'),
+            isTeacher: () => get().hasRole('teacher'),
+            isStudent: () => get().hasRole('student'),
         }),
         {
             name: 'AuthStore',
