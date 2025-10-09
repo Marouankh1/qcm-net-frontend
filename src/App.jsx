@@ -28,7 +28,7 @@ function App() {
             />
             <SidebarProvider>
                 <AppSidebar />
-                <main className="w-full h-screen ">
+                <main className="w-full h-screen overflow-x-hidden">
                     <Outlet />
                     {/* <Button
                         className="cursor-pointer disabled:cursor-none"

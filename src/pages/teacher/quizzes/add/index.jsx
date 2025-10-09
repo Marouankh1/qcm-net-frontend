@@ -15,30 +15,12 @@ import { Checkbox } from '@/components/ui/checkbox';
 import useAuthStore from '@/stores/authStore';
 import { useLogout } from '@/hooks/react-query/auth/useAuth';
 import { useNavigate, useOutlet } from 'react-router';
+import Header from '@/components/header';
+import AddQuizForm from '@/pages/teacher/quizzes/add/components/add-quiz-form';
 
 export default function AddQuizze() {
     const outlet = useOutlet();
-    const { logout, isLoading, setLoading, user, isAuthenticated } = useAuthStore();
-
-    const loginMutation = useLogout();
     const navigate = useNavigate();
-
-    const handleLogOut = async () => {
-        try {
-            setLoading(true);
-            const result = await loginMutation.mutateAsync();
-            if (result.data.success) {
-                logout();
-                setLoading(false);
-                navigate('/login');
-                setTimeout(() => {
-                    toast.success(result.data.message);
-                }, 1000);
-            }
-        } catch (error) {
-            setLoading(false);
-        }
-    };
 
     const [questions, setQuestions] = useState([
         {
@@ -105,98 +87,16 @@ export default function AddQuizze() {
         <div>
             {outlet || (
                 <>
-                    <header className="flex h-16  items-center justify-between gap-2 border-b mx-6">
-                        <div className="flex items-center gap-2">
-                            <SidebarTrigger className="-ml-1" />
-                            {/* <SidebarTrigger /> */}
-                            <Separator
-                                orientation="vertical"
-                                className="mr-2 h-4"
-                            />
-                            <h1 className="text-lg font-semibold">Dashboard</h1>
-                        </div>
-                        <Button
-                            variant="outline"
-                            className="cursor-pointer disabled:cursor-none bg-transparent"
-                            disabled={isLoading}
-                            onClick={() => handleLogOut()}>
-                            {isLoading ? 'Logout ...' : 'Logout'}
-                        </Button>
-                    </header>
-                    <div className="flex flex-1 flex-col gap-6 p-6 max-w-4xl w-full">
+                    <Header title="Create Quiz" />
+                    <div className="p-6 mx-3 space-y-4">
                         <div>
                             <h2 className="text-3xl font-bold tracking-tight">Create New Quiz</h2>
                             <p className="text-muted-foreground">Build a comprehensive quiz for your students</p>
                         </div>
 
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Quiz Information</CardTitle>
-                                <CardDescription>Basic details about your quiz</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="title">Quiz Title</Label>
-                                    <Input
-                                        id="title"
-                                        placeholder="e.g., Network Protocols Fundamentals"
-                                    />
-                                </div>
+                        <AddQuizForm />
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        placeholder="Provide a brief description of what this quiz covers..."
-                                        rows={3}
-                                    />
-                                </div>
-
-                                <div className="grid gap-6 md:grid-cols-2">
-                                    <div className="space-y-2">
-                                        <Label htmlFor="difficulty">Difficulty Level</Label>
-                                        <Select>
-                                            <SelectTrigger id="difficulty">
-                                                <SelectValue placeholder="Select difficulty" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="easy">Easy</SelectItem>
-                                                <SelectItem value="medium">Medium</SelectItem>
-                                                <SelectItem value="hard">Hard</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="duration">Duration (minutes)</Label>
-                                        <Input
-                                            id="duration"
-                                            type="number"
-                                            placeholder="30"
-                                            min="1"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="category">Category</Label>
-                                    <Select>
-                                        <SelectTrigger id="category">
-                                            <SelectValue placeholder="Select category" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="protocols">Network Protocols</SelectItem>
-                                            <SelectItem value="security">Network Security</SelectItem>
-                                            <SelectItem value="routing">Routing & Switching</SelectItem>
-                                            <SelectItem value="wireless">Wireless Networking</SelectItem>
-                                            <SelectItem value="fundamentals">Fundamentals</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        <div className="space-y-4">
+                        {/* <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h3 className="text-xl font-semibold">Questions</h3>
@@ -272,12 +172,7 @@ export default function AddQuizze() {
                                     </CardContent>
                                 </Card>
                             ))}
-                        </div>
-
-                        <div className="flex gap-3 justify-end border-t pt-6">
-                            <Button variant="outline">Save as Draft</Button>
-                            <Button>Publish Quiz</Button>
-                        </div>
+                        </div> */}
                     </div>
                 </>
             )}

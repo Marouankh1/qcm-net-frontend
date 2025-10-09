@@ -5,10 +5,9 @@ import { useLogout } from '@/hooks/react-query/auth/useAuth';
 import useAuthStore from '@/stores/authStore';
 import React from 'react';
 import { useNavigate, useOutlet } from 'react-router';
-import TeacherContent from './components/teacher-content';
 import { toast } from 'sonner';
 
-function Teacher() {
+function Student() {
     const outlet = useOutlet();
     const { logout, isLoading, setLoading, user, isAuthenticated } = useAuthStore();
 
@@ -54,11 +53,11 @@ function Teacher() {
                             {isLoading ? 'Logout ...' : 'Logout'}
                         </Button>
                     </header>
-                    <TeacherContent />
+                    Student
                 </>
             )}
         </div>
     );
 }
 
-export default Teacher;
+export default Student;

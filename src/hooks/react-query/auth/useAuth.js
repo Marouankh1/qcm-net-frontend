@@ -1,4 +1,4 @@
-import { useApiMutation } from '../useApi';
+import { useApiMutation } from '@/hooks/react-query/useApi';
 import api from '@/services/api';
 
 export const useLogin = () => {
