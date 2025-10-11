@@ -58,9 +58,14 @@ import StudentDashboard from '@/pages/student/student';
 import ShowQuizzes from '@/pages/teacher/quizzes/show';
 import AddQuiz from '@/pages/teacher/quizzes/add';
 import useAuthStore from '@/stores/authStore';
+import NotFound from '@/pages/not-found';
 // import StudentQuizzes from '@/pages/student/quizzes';
 
 export const router = createBrowserRouter([
+    {
+        path: '/*',
+        element: <NotFound />,
+    },
     {
         path: '/login',
         element: <Login />,

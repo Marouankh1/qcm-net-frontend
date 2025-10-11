@@ -112,7 +112,7 @@ function QuizzesList() {
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         placeholder="Search quizzes..."
-                        className="pl-9 bg-white/70"
+                        className="pl-9 bg-white/80"
                         value={searchInput}
                         onChange={(e) => setSearchInput(e.target.value)}
                         onKeyDown={handleKeyDown}
