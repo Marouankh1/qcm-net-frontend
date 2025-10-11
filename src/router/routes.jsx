@@ -59,6 +59,7 @@ import ShowQuizzes from '@/pages/teacher/quizzes/show';
 import AddQuiz from '@/pages/teacher/quizzes/add';
 import useAuthStore from '@/stores/authStore';
 import NotFound from '@/pages/not-found';
+import AccountPage from '@/pages/account';
 // import StudentQuizzes from '@/pages/student/quizzes';
 
 export const router = createBrowserRouter([
@@ -94,6 +95,15 @@ export const router = createBrowserRouter([
             // },
 
             // Teacher routes
+            {
+                path: '/account',
+                element: (
+                    <RoleRoute
+                        element={<AccountPage />}
+                        allowedRoles={['teacher', 'admin', 'student']}
+                    />
+                ),
+            },
             {
                 path: '/teacher',
                 element: (

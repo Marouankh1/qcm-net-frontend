@@ -1,8 +1,5 @@
-'use client';
-
-import { BadgeCheck, Bell, ChevronsUpDown, CreditCard, LogOut, Sparkles } from 'lucide-react';
-
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { BadgeCheck, ChevronsUpDown, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,10 +11,32 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import useAuthStore from '@/stores/authStore';
+import { Link, useNavigate } from 'react-router';
+import { useLogout } from '@/hooks/react-query/auth/useAuth';
 
 export function NavUser() {
-    const { user } = useAuthStore();
     const { isMobile } = useSidebar();
+    const { logout, isLoading, setLoading, user } = useAuthStore();
+
+    const loginMutation = useLogout();
+    const navigate = useNavigate();
+
+    const handleLogOut = async () => {
+        try {
+            setLoading(true);
+            const result = await loginMutation.mutateAsync();
+            if (result.data.success) {
+                logout();
+                setLoading(false);
+                navigate('/login');
+                setTimeout(() => {
+                    toast.success(result.data.message);
+                }, 1000);
+            }
+        } catch (error) {
+            setLoading(false);
+        }
+    };
 
     console.log(user);
     return (
@@ -57,13 +76,22 @@ export function NavUser() {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem>
-                                <BadgeCheck />
-                                Account
+                                <Link
+                                    to="/account"
+                                    className="flex items-center gap-2">
+                                    <BadgeCheck />
+                                    Account
+                                </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuItem>
-                            <LogOut />
-                            Log out
+                            <button
+                                className="flex items-center gap-2 border-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isLoading}
+                                onClick={() => handleLogOut()}>
+                                <LogOut />
+                                {isLoading ? 'Logout ...' : 'Logout'}
+                            </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

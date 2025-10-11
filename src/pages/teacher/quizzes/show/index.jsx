@@ -1,18 +1,6 @@
-'use client';
-
-import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Search, Plus, Clock, Users, BarChart3, Edit, Trash2, Eye } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreVertical } from 'lucide-react';
-import { Link, useNavigate, useOutlet } from 'react-router';
-import useAuthStore from '@/stores/authStore';
-import { useLogout } from '@/hooks/react-query/auth/useAuth';
+import { Plus } from 'lucide-react';
+import { Link, useOutlet } from 'react-router';
 import QuizzesList from '@/pages/teacher/quizzes/show/components/quizzes-list';
 import Header from '@/components/header';
 
