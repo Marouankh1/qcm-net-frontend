@@ -30,7 +30,7 @@ export default function ShowQuizzes() {
                                 <h2 className="text-3xl font-bold tracking-tight">Quiz Library</h2>
                                 <p className="text-muted-foreground">Manage and view all your quizzes</p>
                             </div>
-                            <Link to="/quizzes/create">
+                            <Link to="/teacher/quizzes/create">
                                 <Button className="gap-2 cursor-pointer">
                                     <Plus className="h-4 w-4" />
                                     Create Quiz

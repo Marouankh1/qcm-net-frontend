@@ -19,7 +19,7 @@ function EmptyQuizzes({ searchTerm, setSearchTerm, setSearchInput }) {
                 </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
-                <Link to="/quizzes/create">
+                <Link to="/teacher/quizzes/create">
                     <Button className="gap-2 cursor-pointer">
                         <Plus className="h-4 w-4" />
                         Create Quiz

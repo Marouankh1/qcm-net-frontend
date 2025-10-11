@@ -48,7 +48,7 @@ function AddQuizForm() {
             const result = await createQuizMutation.mutateAsync(quizzeData);
             if (result.data.success) {
                 form.reset();
-                navigate('/quizzes');
+                navigate('/teacher/quizzes');
             }
         } catch (error) {
             // Error is already handled in the mutation
