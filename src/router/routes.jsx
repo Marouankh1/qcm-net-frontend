@@ -24,6 +24,7 @@ import AddQuestion from '@/pages/teacher/questions/add';
 import StudentResultsPage from '@/pages/teacher/student-results';
 import StudentDetailPage from '@/pages/teacher/student-results/student-detail';
 import QuizResultsDetailPage from '@/pages/teacher/student-results/quiz-results-detail';
+import { QuizPublishCheck } from './quiz-publish-check';
 
 export const router = createBrowserRouter([
     {
@@ -107,7 +108,7 @@ export const router = createBrowserRouter([
                 path: '/teacher/quiz/:id/questions/create',
                 element: (
                     <RoleRoute
-                        element={<AddQuestion />}
+                        element={<QuizPublishCheck element={<AddQuestion />} />}
                         allowedRoles={['teacher', 'admin']}
                     />
                 ),

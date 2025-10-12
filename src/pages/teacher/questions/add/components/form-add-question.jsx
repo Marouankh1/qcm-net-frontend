@@ -161,9 +161,10 @@ function FormAddQuestion() {
 
                     return {
                         ...q,
-                        answers: updatedAnswers,
+                        answers: updatedAnswers, // Supprimez cette ligne
                         correctAnswerId: wasCorrectAnswer ? '' : q.correctAnswerId,
                         answers: updatedAnswers.map((a) => ({
+                            // Gardez seulement cette ligne
                             ...a,
                             isCorrect: wasCorrectAnswer ? false : a.isCorrect,
                         })),

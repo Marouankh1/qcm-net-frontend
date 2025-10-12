@@ -1,438 +1,272 @@
-import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Edit, Save, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import { Skeleton } from '@/components/ui/skeleton';
+import useAuthStore from '@/stores/authStore';
 import useQuizStore from '@/stores/quizStore';
-import useQuestionStore from '@/stores/questionStore';
+import { BarChart3, Eye, FileQuestionMark, MoreVertical, Search, Trash2, Users, RefreshCw, Ban } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import EmptyQuizzes from '@/pages/teacher/quizzes/show/components/empty-quizzes';
+import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-function QuizDetails() {
-    const { currentQuiz, isLoading: quizLoading } = useQuizStore();
-    const { id: quizId } = useParams();
+function QuizzesList() {
+    const { user } = useAuthStore();
+    const { quizzes, isLoading, fetchQuizzes, deleteQuiz, setCurrentQuiz, clearError, error } = useQuizStore();
     const navigate = useNavigate();
 
-    const { fetchQuiz, updateQuiz, publishQuiz } = useQuizStore();
+    const [searchInput, setSearchInput] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const {
-        getQuestionsByQuiz,
-        getChoicesByQuestion,
-        fetchQuestionsByQuiz,
-        fetchAllChoices,
-        isLoading: questionLoading,
-    } = useQuestionStore();
-
-    const [isEditing, setIsEditing] = useState(false);
-    const [isEditingQuestions, setIsEditingQuestions] = useState(false);
-    const [quizData, setQuizData] = useState({
-        title: '',
-        description: '',
-    });
-    const [questions, setQuestions] = useState([]);
-    const [originalQuizData, setOriginalQuizData] = useState(null);
-    const [originalQuestions, setOriginalQuestions] = useState([]);
-
-    // Load quiz data
+    // Load quizzes on component mount and when search term changes
     useEffect(() => {
-        if (quizId) {
-            loadQuizData();
-        }
-    }, [quizId]);
+        loadQuizzes();
+    }, [searchTerm]);
 
-    const loadQuizData = async () => {
+    const loadQuizzes = async () => {
         try {
-            await fetchQuiz(quizId);
-            await fetchQuestionsByQuiz(quizId);
-            await fetchAllChoices();
+            clearError();
+            const filters = searchTerm ? { search: searchTerm } : {};
+            await fetchQuizzes(filters);
+        } catch (error) {
+            console.error('Error loading quizzes:', error);
+        }
+    };
 
-            // Update local state with quiz data
-            if (currentQuiz) {
-                const quizData = {
-                    title: currentQuiz.title || '',
-                    description: currentQuiz.description || '',
-                };
-                setQuizData(quizData);
-                setOriginalQuizData(quizData);
+    const handleDeleteQuiz = async (quizId) => {
+        try {
+            if (!quizId) {
+                toast.error('Quiz ID is required');
+                return;
             }
 
-            // Update local state with questions
-            const existingQuestions = getQuestionsByQuiz(parseInt(quizId));
-            if (existingQuestions.length > 0) {
-                const formattedQuestions = existingQuestions.map((q) => {
-                    const choices = getChoicesByQuestion(q.id);
-                    // Find the correct answer for radio button
-                    const correctAnswer = choices.find((c) => c.is_correct);
-                    return {
-                        id: q.id.toString(),
-                        text: q.question_text,
-                        points: q.points || 1,
-                        correctAnswerId: correctAnswer ? correctAnswer.id.toString() : '',
-                        answers: choices.map((c) => ({
-                            id: c.id.toString(),
-                            text: c.choice_text,
-                            isCorrect: c.is_correct,
-                        })),
-                    };
-                });
-                setQuestions(formattedQuestions);
-                setOriginalQuestions(JSON.parse(JSON.stringify(formattedQuestions)));
+            if (!confirm('Are you sure you want to delete this quiz? This action cannot be undone.')) {
+                return;
             }
+
+            await deleteQuiz(quizId);
+            toast.success('Quiz deleted successfully!');
         } catch (error) {
-            console.error('Error loading quiz data:', error);
-            toast.error('Failed to load quiz data');
+            console.error('Error deleting quiz:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to delete quiz';
+            toast.error(errorMessage);
         }
     };
 
-    const handleEditQuiz = () => {
-        setIsEditing(true);
-    };
-
-    const handleCancelEditQuiz = () => {
-        setQuizData(originalQuizData);
-        setIsEditing(false);
-    };
-
-    const handleSaveQuiz = async () => {
-        try {
-            // Only send title and description in the request
-            const updateData = {
-                title: quizData.title,
-                description: quizData.description,
-            };
-
-            await updateQuiz(parseInt(quizId), updateData);
-            setOriginalQuizData(quizData);
-            setIsEditing(false);
-            toast.success('Quiz updated successfully!');
-        } catch (error) {
-            console.error('Error updating quiz:', error);
-            toast.error('Failed to update quiz');
+    const handleSearch = () => {
+        const trimmedInput = searchInput.trim();
+        if (trimmedInput !== searchTerm) {
+            setSearchTerm(trimmedInput);
         }
     };
 
-    const handleEditQuestions = () => {
-        setIsEditingQuestions(true);
-    };
-
-    const handleCancelEditQuestions = () => {
-        setQuestions(JSON.parse(JSON.stringify(originalQuestions)));
-        setIsEditingQuestions(false);
-    };
-
-    const handleSaveQuestions = async () => {
-        try {
-            // Here you would implement the update questions logic
-            // For now, just save locally
-            setOriginalQuestions(JSON.parse(JSON.stringify(questions)));
-            setIsEditingQuestions(false);
-            toast.success('Questions updated successfully!');
-        } catch (error) {
-            console.error('Error updating questions:', error);
-            toast.error('Failed to update questions');
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
         }
     };
 
-    const updateQuestion = (questionId, text) => {
-        setQuestions(questions.map((q) => (q.id === questionId ? { ...q, text } : q)));
-    };
-
-    const updateAnswer = (questionId, answerId, text) => {
-        setQuestions(
-            questions.map((q) =>
-                q.id === questionId
-                    ? {
-                          ...q,
-                          answers: q.answers.map((a) => (a.id === answerId ? { ...a, text } : a)),
-                      }
-                    : q
-            )
-        );
-    };
-
-    const handleCorrectAnswerChange = (questionId, answerId) => {
-        setQuestions(
-            questions.map((q) =>
-                q.id === questionId
-                    ? {
-                          ...q,
-                          correctAnswerId: answerId,
-                          answers: q.answers.map((a) => ({
-                              ...a,
-                              isCorrect: a.id === answerId, // Set only the selected answer as correct
-                          })),
-                      }
-                    : q
-            )
-        );
-    };
-
-    const updateQuizField = (field, value) => {
-        setQuizData((prev) => ({ ...prev, [field]: value }));
-    };
-
-    const handlePublishToggle = async () => {
-        try {
-            const newPublishStatus = !currentQuiz?.is_published;
-            await publishQuiz(parseInt(quizId), newPublishStatus);
-            toast.success(`Quiz ${newPublishStatus ? 'published' : 'unpublished'} successfully!`);
-        } catch (error) {
-            console.error('Error updating publish status:', error);
-            toast.error('Failed to update publish status');
+    const handleClearSearch = () => {
+        setSearchInput('');
+        if (searchTerm !== '') {
+            setSearchTerm('');
         }
     };
 
-    const isLoading = quizLoading || questionLoading;
+    const handleRefresh = () => {
+        loadQuizzes();
+    };
 
-    // Check if quiz is published
-    const isPublished = currentQuiz?.is_published;
+    // Empêcher l'accès à l'ajout de questions pour les quizzes publiés
+    const handleAddQuestions = (quiz) => {
+        if (quiz.is_published) {
+            toast.error('Cannot add questions to a published quiz. Please unpublish it first.');
+            return;
+        }
+        navigate(`/teacher/quiz/${quiz.id}/questions/create`);
+    };
 
+    // Loading state
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-4 text-muted-foreground">Loading quiz...</p>
-                </div>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 my-6">
+                {[...Array(6)].map((_, i) => (
+                    <Card
+                        key={i}
+                        className="flex flex-col">
+                        <CardHeader>
+                            <Skeleton className="h-6 w-3/4 mb-2" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-2/3 mt-2" />
+                        </CardHeader>
+                        <CardContent>
+                            <Skeleton className="h-4 w-1/2 mb-2" />
+                            <Skeleton className="h-4 w-1/3" />
+                        </CardContent>
+                        <CardFooter>
+                            <Skeleton className="h-4 w-2/3" />
+                        </CardFooter>
+                    </Card>
+                ))}
             </div>
         );
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 w-full">
-            {/* Quiz Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tight">{currentQuiz?.title || 'Quiz Details'}</h2>
-                    <p className="text-muted-foreground">{currentQuiz?.description || 'View and manage quiz details'}</p>
-                    {isPublished && (
-                        <span className="inline-block mt-2 px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
-                            Published
-                        </span>
-                    )}
+        <>
+            {error && <div className="mb-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>}
+
+            <div className="flex items-center gap-4 my-6">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                        placeholder="Search quizzes by title or description..."
+                        className="pl-9 bg-white/80"
+                        value={searchInput}
+                        onChange={(e) => setSearchInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        disabled={isLoading}
+                    />
                 </div>
-                <div className="flex gap-2">
+                <Button
+                    onClick={handleSearch}
+                    variant="default"
+                    className={'cursor-pointer'}
+                    disabled={isLoading}>
+                    Search
+                </Button>
+                {(searchInput || searchTerm) && (
                     <Button
+                        className={'cursor-pointer'}
+                        onClick={handleClearSearch}
                         variant="outline"
-                        onClick={() => navigate('/teacher/quizzes')}>
-                        Back to Quizzes
+                        disabled={isLoading}>
+                        Clear
                     </Button>
-                </div>
+                )}
+                <Button
+                    className={'cursor-pointer'}
+                    onClick={handleRefresh}
+                    variant="outline"
+                    size="icon"
+                    disabled={isLoading}>
+                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                </Button>
             </div>
 
-            {/* Quiz Information Card */}
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle>Quiz Information</CardTitle>
-                            <CardDescription>Basic details about your quiz</CardDescription>
-                        </div>
-                        {!isPublished && !isEditing ? (
-                            <Button
-                                onClick={handleEditQuiz}
-                                variant="outline"
-                                className="gap-2"
-                                disabled={isEditingQuestions}>
-                                <Edit className="h-4 w-4" />
-                                Edit Quiz
-                            </Button>
-                        ) : !isPublished && isEditing ? (
-                            <div className="flex gap-2">
-                                <Button
-                                    onClick={handleCancelEditQuiz}
-                                    variant="outline"
-                                    className="gap-2">
-                                    <X className="h-4 w-4" />
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={handleSaveQuiz}
-                                    className="gap-2">
-                                    <Save className="h-4 w-4" />
-                                    Save Changes
-                                </Button>
-                            </div>
-                        ) : null}
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="title">Quiz Title</Label>
-                        <Input
-                            id="title"
-                            placeholder="e.g., Network Protocols Fundamentals"
-                            value={quizData.title}
-                            onChange={(e) => updateQuizField('title', e.target.value)}
-                            disabled={!isEditing || isPublished}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
-                        <Textarea
-                            id="description"
-                            placeholder="Provide a brief description of what this quiz covers..."
-                            rows={3}
-                            value={quizData.description}
-                            onChange={(e) => updateQuizField('description', e.target.value)}
-                            disabled={!isEditing || isPublished}
-                        />
-                    </div>
-
-                    {/* Quiz Metadata (Read-only) */}
-                    <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                        <div>
-                            <Label className="text-sm text-muted-foreground">Status</Label>
-                            <p className="text-sm font-medium">
-                                {currentQuiz?.is_published ? (
-                                    <span className="text-green-600">Published</span>
-                                ) : (
-                                    <span className="text-orange-600">Draft</span>
-                                )}
+            {quizzes.length === 0 ? (
+                <EmptyQuizzes
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                    setSearchInput={setSearchInput}
+                />
+            ) : (
+                <>
+                    <div className="mb-4 text-sm text-muted-foreground">
+                        {searchTerm ? (
+                            <p>
+                                Found {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''} matching "{searchTerm}"
                             </p>
-                        </div>
-                        <div>
-                            <Label className="text-sm text-muted-foreground">Created</Label>
-                            <p className="text-sm font-medium">
-                                {currentQuiz?.created_at ? new Date(currentQuiz.created_at).toLocaleDateString() : 'N/A'}
-                            </p>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
-            {/* Questions Section */}
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle>Questions ({questions.length})</CardTitle>
-                            <CardDescription>Questions and multiple choice answers for this quiz</CardDescription>
-                        </div>
-                        {!isPublished && !isEditingQuestions ? (
-                            <Button
-                                onClick={handleEditQuestions}
-                                variant="outline"
-                                className="gap-2"
-                                disabled={isEditing}>
-                                <Edit className="h-4 w-4" />
-                                Edit Questions
-                            </Button>
-                        ) : !isPublished && isEditingQuestions ? (
-                            <div className="flex gap-2">
-                                <Button
-                                    onClick={handleCancelEditQuestions}
-                                    variant="outline"
-                                    className="gap-2">
-                                    <X className="h-4 w-4" />
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={handleSaveQuestions}
-                                    className="gap-2">
-                                    <Save className="h-4 w-4" />
-                                    Save Questions
-                                </Button>
-                            </div>
-                        ) : null}
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="space-y-4">
-                        {questions.length === 0 ? (
-                            <div className="text-center py-8">
-                                <p className="text-muted-foreground">No questions added yet.</p>
-                                {!isPublished && (
-                                    <Button
-                                        variant="outline"
-                                        className="mt-4"
-                                        onClick={() => navigate(`/teacher/quiz/${quizId}/questions/create`)}>
-                                        Add Questions
-                                    </Button>
-                                )}
-                            </div>
                         ) : (
-                            questions.map((question, qIndex) => (
-                                <Card key={question.id}>
-                                    <CardHeader>
-                                        <div className="flex-1 space-y-4">
-                                            <div className="flex items-start justify-between gap-2">
-                                                <Label className="text-base">
-                                                    Question {qIndex + 1} {question.points && `(${question.points} points)`}
-                                                </Label>
-                                            </div>
-                                            <Textarea
-                                                placeholder="Enter your question here..."
-                                                value={question.text}
-                                                onChange={(e) => updateQuestion(question.id, e.target.value)}
-                                                rows={2}
-                                                disabled={!isEditingQuestions || isPublished}
-                                            />
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent className="space-y-3">
-                                        <Label className="text-sm text-muted-foreground">
-                                            Answer Options {isEditingQuestions && !isPublished && '(select the correct answer)'}
-                                        </Label>
-                                        <div className="space-y-3">
-                                            {question.answers.map((answer, aIndex) => (
-                                                <div
-                                                    key={answer.id}
-                                                    className="flex items-center gap-3 p-2 rounded-lg border border-border hover:bg-accent/50 transition-colors">
-                                                    {isEditingQuestions && !isPublished ? (
-                                                        <input
-                                                            type="radio"
-                                                            name={`question-${question.id}`}
-                                                            value={answer.id}
-                                                            checked={question.correctAnswerId === answer.id}
-                                                            onChange={() => handleCorrectAnswerChange(question.id, answer.id)}
-                                                            className="h-4 w-4 text-primary focus:ring-primary"
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className={`w-4 h-4 rounded-full border-2 ${
-                                                                answer.isCorrect ? 'bg-primary border-primary' : 'border-gray-300'
-                                                            }`}
-                                                        />
-                                                    )}
-                                                    <Input
-                                                        placeholder={`Answer ${aIndex + 1}`}
-                                                        value={answer.text}
-                                                        onChange={(e) => updateAnswer(question.id, answer.id, e.target.value)}
-                                                        className={`border-0 focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none ${
-                                                            answer.isCorrect ? 'bg-primary/5' : ''
-                                                        }`}
-                                                        disabled={!isEditingQuestions || isPublished}
-                                                    />
-                                                    {answer.isCorrect && (isPublished || !isEditingQuestions) && (
-                                                        <span className="text-xs text-green-600 font-medium">Correct</span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))
+                            <p>
+                                Showing {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''}
+                            </p>
                         )}
                     </div>
-                </CardContent>
-            </Card>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 justify-end border-t pt-6">
-                <Button
-                    variant="outline"
-                    onClick={() => navigate('/teacher/quizzes')}>
-                    Back to Quizzes
-                </Button>
-                {!isPublished && <Button onClick={handlePublishToggle}>Publish Quiz</Button>}
-            </div>
-        </div>
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {quizzes.map((quiz) => (
+                            <Card
+                                key={quiz.id}
+                                className="flex flex-col hover:shadow-lg transition-shadow">
+                                <CardHeader>
+                                    <div className="flex items-start justify-between gap-2">
+                                        <div className="flex-1">
+                                            <CardTitle className="text-xl leading-tight">{quiz.title}</CardTitle>
+                                            <CardDescription className="mt-2 line-clamp-2">{quiz.description}</CardDescription>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    disabled={isLoading}>
+                                                    <MoreVertical className="h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem asChild>
+                                                    <Link
+                                                        to={`/teacher/quiz/${quiz.id}`}
+                                                        className="flex items-center gap-2 w-full">
+                                                        <Eye className="h-4 w-4" />
+                                                        View Details
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                {!quiz.is_published ? (
+                                                    <DropdownMenuItem asChild>
+                                                        <Link
+                                                            to={`/teacher/quiz/${quiz.id}/questions/create`}
+                                                            className="flex items-center gap-2 w-full">
+                                                            <FileQuestionMark className="h-4 w-4" />
+                                                            Add Questions
+                                                        </Link>
+                                                    </DropdownMenuItem>
+                                                ) : (
+                                                    <DropdownMenuItem
+                                                        className="text-muted-foreground cursor-not-allowed"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            toast.error(
+                                                                'Cannot add questions to a published quiz. Please unpublish it first.'
+                                                            );
+                                                        }}
+                                                        disabled>
+                                                        <Ban className="h-4 w-4 mr-2" />
+                                                        Add Questions
+                                                    </DropdownMenuItem>
+                                                )}
+                                                <DropdownMenuItem
+                                                    className="text-destructive"
+                                                    asChild>
+                                                    <button
+                                                        className="flex items-center gap-2 w-full text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent p-2"
+                                                        disabled={isLoading}
+                                                        onClick={() => handleDeleteQuiz(quiz.id)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                        {isLoading ? 'Deleting...' : 'Delete'}
+                                                    </button>
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="flex-1">
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <BarChart3 className="h-4 w-4" />
+                                            <span>{quiz.questions_count || 0} questions</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Users className="h-4 w-4" />
+                                            <span>{quiz.participants_count || 0} students</span>
+                                        </div>
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="text-xs text-muted-foreground border-t pt-4">
+                                    Created {formatDistanceToNow(new Date(quiz.created_at))} ago
+                                    {quiz.is_published && <span className="ml-2 text-green-600 font-medium">• Published</span>}
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </>
+            )}
+        </>
     );
 }
 
-export default QuizDetails;
+export default QuizzesList;
