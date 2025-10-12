@@ -1,47 +1,3 @@
-// import { createBrowserRouter } from 'react-router';
-// import App from '@/App';
-// import { Login } from '@/pages/auth/login';
-// import Signup from '@/pages/auth/signup';
-// import { ProtectedRoute } from '@/router/protected-route';
-// import Admin from '@/pages/teacher/teacher';
-// import Teacher from '@/pages/teacher/teacher';
-// import Show from '@/pages/teacher/quizzes/show';
-// import AddQuizze from '@/pages/teacher/quizzes/add';
-// import ShowQuizzes from '@/pages/teacher/quizzes/show';
-
-// export const router = createBrowserRouter([
-//     {
-//         path: '/login',
-//         element: <Login />,
-//     },
-//     {
-//         path: '/signup',
-//         element: <Signup />,
-//     },
-//     {
-//         path: '/',
-//         element: <ProtectedRoute element={<App />} />,
-//         children: [
-//             {
-//                 path: '/admin',
-//                 element: <Admin />,
-//             },
-//             {
-//                 path: '/dashboard',
-//                 element: <Teacher />,
-//             },
-//             {
-//                 path: '/quizzes',
-//                 element: <ShowQuizzes />,
-//             },
-//             {
-//                 path: '/quizzes/create',
-//                 element: <AddQuizze />,
-//             },
-//         ],
-//     },
-// ]);
-
 // router/index.jsx
 import { createBrowserRouter, Navigate } from 'react-router';
 import App from '@/App';
@@ -60,7 +16,14 @@ import AddQuiz from '@/pages/teacher/quizzes/add';
 import useAuthStore from '@/stores/authStore';
 import NotFound from '@/pages/not-found';
 import AccountPage from '@/pages/account';
+import QuizDetailsPage from '@/pages/teacher/quizzes/quiz-details';
+import AddQuestion from '@/pages/teacher/questions/add';
 // import StudentQuizzes from '@/pages/student/quizzes';
+
+// Nouvelle page pour les résultats étudiants
+import StudentResultsPage from '@/pages/teacher/student-results';
+import StudentDetailPage from '@/pages/teacher/student-results/student-detail';
+import QuizResultsDetailPage from '@/pages/teacher/student-results/quiz-results-detail';
 
 export const router = createBrowserRouter([
     {
@@ -127,6 +90,53 @@ export const router = createBrowserRouter([
                 element: (
                     <RoleRoute
                         element={<AddQuiz />}
+                        allowedRoles={['teacher', 'admin']}
+                    />
+                ),
+            },
+            {
+                path: '/teacher/quiz/:id',
+                element: (
+                    <RoleRoute
+                        element={<QuizDetailsPage />}
+                        allowedRoles={['teacher', 'admin']}
+                    />
+                ),
+            },
+            {
+                path: '/teacher/quiz/:id/questions/create',
+                element: (
+                    <RoleRoute
+                        element={<AddQuestion />}
+                        allowedRoles={['teacher', 'admin']}
+                    />
+                ),
+            },
+
+            // Nouveaux routes pour les résultats étudiants
+            {
+                path: '/teacher/student-results',
+                element: (
+                    <RoleRoute
+                        element={<StudentResultsPage />}
+                        allowedRoles={['teacher', 'admin']}
+                    />
+                ),
+            },
+            {
+                path: '/teacher/student-results/:studentId',
+                element: (
+                    <RoleRoute
+                        element={<StudentDetailPage />}
+                        allowedRoles={['teacher', 'admin']}
+                    />
+                ),
+            },
+            {
+                path: '/teacher/student-results/:studentId/quiz/:quizId',
+                element: (
+                    <RoleRoute
+                        element={<QuizResultsDetailPage />}
                         allowedRoles={['teacher', 'admin']}
                     />
                 ),
