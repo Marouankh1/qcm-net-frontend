@@ -1,19 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { Home, Search, ArrowLeft } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { Link } from 'react-router';
 
 export default function NotFound() {
     return (
         <div className="flex min-h-screen items-center justify-center bg-background px-4">
             <div className="mx-auto max-w-2xl text-center">
-                {/* 404 Number */}
                 <div className="mb-8">
                     <h1 className="text-7xl md:text-[180px] font-bold leading-none tracking-tighter text-primary sm:text-[240px]">
                         404
                     </h1>
                 </div>
 
-                {/* Error Message */}
                 <div className="mb-8 space-y-4">
                     <h2 className="text-primary text-3xl font-bold tracking-tight sm:text-4xl">Page Not Found</h2>
                     <p className="text-pretty text-lg text-muted-foreground">
@@ -22,7 +20,6 @@ export default function NotFound() {
                     </p>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                     <Button
                         asChild

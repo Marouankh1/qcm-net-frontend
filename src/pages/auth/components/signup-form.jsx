@@ -6,7 +6,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
-import { useSignup } from '@/hooks/react-query/auth/useAuth';
 import useAuthStore from '@/stores/authStore';
 import { toast } from 'sonner';
 
@@ -40,7 +39,7 @@ const signupSchema = z
             .regex(/^[a-zA-Z\s]+$/, {
                 message: 'Last name can only contain letters and spaces',
             }),
-        email: z.email({
+        email: z.string().email({
             message: 'Please enter a valid email address',
         }),
         password: z
@@ -67,9 +66,7 @@ const signupSchema = z
     });
 
 export function SignupForm() {
-    const { login, isLoading, error, clearError, user, isAuthenticated, setLoading } = useAuthStore();
-
-    const signupMutation = useSignup();
+    const { signupUser, isLoading, error, clearError } = useAuthStore();
     const navigate = useNavigate();
 
     const form = useForm({
@@ -85,22 +82,20 @@ export function SignupForm() {
     });
 
     const onSubmit = async (credentials) => {
-        console.log('onSubmit ===> credentials');
-        console.log(credentials);
+        console.log('onSubmit ===> credentials', credentials);
+
         try {
-            setLoading(true);
-            const result = await signupMutation.mutateAsync(credentials);
-            if (result.data.success) {
-                login(result.data.data.user);
-                setLoading(false);
+            clearError();
+            const result = await signupUser(credentials);
+
+            if (result.success) {
+                toast.success(result.message || 'Account created successfully!');
                 navigate('/');
-                setTimeout(() => {
-                    toast.success(result.data.message);
-                }, 1000);
             }
         } catch (error) {
-            // Error is already handled in the mutation
-            setLoading(false);
+            console.error('Signup error:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Signup failed';
+            toast.error(errorMessage);
         }
     };
 
@@ -110,6 +105,8 @@ export function SignupForm() {
 
     return (
         <div className="w-full max-w-sm mx-auto space-y-4">
+            {error && <div className="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>}
+
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -125,6 +122,7 @@ export function SignupForm() {
                                         id="first_name"
                                         placeholder="Enter your First Name"
                                         {...field}
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -142,6 +140,7 @@ export function SignupForm() {
                                         id="last_name"
                                         placeholder="Enter your Last Name"
                                         {...field}
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -159,6 +158,7 @@ export function SignupForm() {
                                         id="email"
                                         placeholder="name@example.com"
                                         {...field}
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -177,6 +177,7 @@ export function SignupForm() {
                                         type="password"
                                         placeholder="********"
                                         {...field}
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -195,6 +196,7 @@ export function SignupForm() {
                                         type="password"
                                         placeholder="********"
                                         {...field}
+                                        disabled={isLoading}
                                     />
                                 </FormControl>
                                 <FormMessage />
@@ -211,7 +213,8 @@ export function SignupForm() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
-                                        className="flex justify-center items-center space-y-1">
+                                        className="flex justify-center items-center space-y-1"
+                                        disabled={isLoading}>
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="admin" />
@@ -240,24 +243,9 @@ export function SignupForm() {
                         type="submit"
                         className="w-full cursor-pointer disabled:cursor-none mt-1"
                         disabled={isLoading}>
-                        {isLoading ? 'Sign up ...' : 'Sign up'}
+                        {isLoading ? 'Signing up...' : 'Sign up'}
                     </Button>
-                    {/* <Button
-                        onClick={handleGoogleLogin}
-                        variant="outline"
-                        type="button"
-                        className="w-full flex items-center justify-center gap-3">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            className="w-5 h-5">
-                            <path
-                                d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                                fill="currentColor"
-                            />
-                        </svg>
-                        Sign up with Google
-                    </Button> */}
+
                     <FormDescription className="px-6 text-center">
                         Already have an account?{' '}
                         <Link

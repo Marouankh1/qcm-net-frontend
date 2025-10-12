@@ -12,33 +12,32 @@ import {
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
 import useAuthStore from '@/stores/authStore';
 import { Link, useNavigate } from 'react-router';
-import { useLogout } from '@/hooks/react-query/auth/useAuth';
+import { toast } from 'sonner';
 
 export function NavUser() {
     const { isMobile } = useSidebar();
-    const { logout, isLoading, setLoading, user } = useAuthStore();
-
-    const loginMutation = useLogout();
+    const { logoutUser, user, isLoading } = useAuthStore();
     const navigate = useNavigate();
 
     const handleLogOut = async () => {
         try {
-            setLoading(true);
-            const result = await loginMutation.mutateAsync();
-            if (result.data.success) {
-                logout();
-                setLoading(false);
-                navigate('/login');
-                setTimeout(() => {
-                    toast.success(result.data.message);
-                }, 1000);
-            }
+            await logoutUser();
+            toast.success('Logged out successfully!');
+            navigate('/login');
         } catch (error) {
-            setLoading(false);
+            console.error('Logout error:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Logout failed';
+            toast.error(errorMessage);
         }
     };
 
-    console.log(user);
+    if (!user) {
+        return null;
+    }
+
+    const userInitials = `${user.first_name?.[0]?.toUpperCase() || ''}${user.last_name?.[0]?.toUpperCase() || ''}`;
+    const userName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
@@ -48,11 +47,11 @@ export function NavUser() {
                             size="lg"
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                             <Avatar className="h-8 w-8 rounded-lg">
-                                <AvatarFallback className="rounded-lg">{`${user.first_name[0].toUpperCase()}${user.last_name[0].toUpperCase()}`}</AvatarFallback>
+                                <AvatarFallback className="rounded-lg">{userInitials || 'U'}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-medium">{`${user.first_name} ${user.last_name}`}</span>
-                                <span className="truncate text-xs">{user.email}</span>
+                                <span className="truncate font-medium">{userName || 'User'}</span>
+                                <span className="truncate text-xs">{user.email || ''}</span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
@@ -65,32 +64,33 @@ export function NavUser() {
                         <DropdownMenuLabel className="p-0 font-normal">
                             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                 <Avatar className="h-8 w-8 rounded-lg">
-                                    <AvatarFallback className="rounded-lg">{`${user.first_name[0].toUpperCase()}${user.last_name[0].toUpperCase()}`}</AvatarFallback>
+                                    <AvatarFallback className="rounded-lg">{userInitials || 'U'}</AvatarFallback>
                                 </Avatar>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">{`${user.first_name} ${user.last_name}`}</span>
-                                    <span className="truncate text-xs">{user.email}</span>
+                                    <span className="truncate font-medium">{userName || 'User'}</span>
+                                    <span className="truncate text-xs">{user.email || ''}</span>
                                 </div>
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem asChild>
                                 <Link
                                     to="/account"
-                                    className="flex items-center gap-2">
-                                    <BadgeCheck />
+                                    className="flex items-center gap-2 w-full">
+                                    <BadgeCheck className="h-4 w-4" />
                                     Account
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
-                        <DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
                             <button
-                                className="flex items-center gap-2 border-none p-0 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center gap-2 w-full text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent p-2"
                                 disabled={isLoading}
-                                onClick={() => handleLogOut()}>
-                                <LogOut />
-                                {isLoading ? 'Logout ...' : 'Logout'}
+                                onClick={handleLogOut}>
+                                <LogOut className="h-4 w-4" />
+                                {isLoading ? 'Logging out...' : 'Logout'}
                             </button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
