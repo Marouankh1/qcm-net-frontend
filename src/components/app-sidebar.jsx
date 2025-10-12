@@ -85,7 +85,7 @@
 
 // AppSidebar.jsx
 import * as React from 'react';
-import { BarChart3, FilePlus2, FileTextIcon, LayoutDashboardIcon, BookOpen } from 'lucide-react';
+import { BarChart3, FilePlus2, FileTextIcon, LayoutDashboardIcon, BookOpen, Users, PieChart } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
@@ -99,9 +99,15 @@ const navConfig = {
     ],
     teacher: [
         { title: 'Dashboard', url: '/teacher', icon: LayoutDashboardIcon },
-        { title: 'Show Quizzes', url: '/teacher/quizzes', icon: FileTextIcon },
-        { title: 'Create Quizzes', url: '/teacher/quizzes/create', icon: FilePlus2 },
-        { title: 'Statistics', url: '/teacher/statistics', icon: BarChart3 },
+        { title: 'Quizzes', url: '/teacher/quizzes', icon: FileTextIcon },
+        { title: 'Create Quiz', url: '/teacher/quizzes/create', icon: FilePlus2 },
+        {
+            title: 'Analytics',
+            items: [
+                { title: 'Student Results', url: '/teacher/student-results', icon: Users },
+                { title: 'Statistics', url: '/teacher/statistics', icon: PieChart },
+            ],
+        },
     ],
     student: [
         { title: 'Dashboard', url: '/student', icon: LayoutDashboardIcon },
@@ -112,7 +118,7 @@ const navConfig = {
 
 export function AppSidebar({ ...props }) {
     const { user } = useAuthStore();
-    const role = user?.role || 'student'; // fallback to student or adjust as needed
+    const role = user?.role || 'student';
 
     const navItems = navConfig[role] || [];
 

@@ -13,12 +13,22 @@ import { SidebarContent, SidebarInset, SidebarProvider, SidebarTrigger } from '@
 import { Toaster } from '@/components/ui/sonner';
 import { useLogout } from '@/hooks/react-query/auth/useAuth';
 import useAuthStore from '@/stores/authStore';
+import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 // import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 // import { AppSidebar } from '@/components/app-sidebar';
 
 function App() {
+    const { validateToken, isAuthenticated } = useAuthStore();
+
+    useEffect(() => {
+        // Validate token on app start if user is authenticated
+        if (isAuthenticated) {
+            validateToken();
+        }
+    }, [isAuthenticated, validateToken]);
+
     return (
         <>
             <Toaster
