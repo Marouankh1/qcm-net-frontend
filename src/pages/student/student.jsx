@@ -1,7 +1,9 @@
-import React from 'react';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import React from 'react';
 import { useOutlet } from 'react-router';
+import StudentContent from './components/student-content';
+import Header from '@/components/header';
 
 function Student() {
     const outlet = useOutlet();
@@ -10,17 +12,8 @@ function Student() {
         <div className={'w-full h-full'}>
             {outlet || (
                 <>
-                    <header className="flex h-16  items-center justify-between gap-2 border-b mx-6">
-                        <div className="flex items-center gap-2">
-                            <SidebarTrigger className="-ml-1" />
-                            <Separator
-                                orientation="vertical"
-                                className="mr-2 h-4"
-                            />
-                            <h1 className="text-lg font-semibold">Dashboard</h1>
-                        </div>
-                    </header>
-                    Student
+                    <Header title="Student Dashboard" />
+                    <StudentContent />
                 </>
             )}
         </div>

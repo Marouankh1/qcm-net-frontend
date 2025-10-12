@@ -10,7 +10,6 @@ import { RoleRoute } from '@/router/role-route';
 // Pages
 // import AdminDashboard from '@/pages/admin/dashboard';
 import TeacherDashboard from '@/pages/teacher/teacher';
-import StudentDashboard from '@/pages/student/student';
 import ShowQuizzes from '@/pages/teacher/quizzes/show';
 import AddQuiz from '@/pages/teacher/quizzes/add';
 import useAuthStore from '@/stores/authStore';
@@ -25,6 +24,12 @@ import StudentResultsPage from '@/pages/teacher/student-results';
 import StudentDetailPage from '@/pages/teacher/student-results/student-detail';
 import QuizResultsDetailPage from '@/pages/teacher/student-results/quiz-results-detail';
 import { QuizPublishCheck } from './quiz-publish-check';
+import Student from '@/pages/student/student';
+import ShowQuizzesStudent from '@/pages/student/quizzes/show-quizzes';
+import QuizDetailsStudentPage from '@/pages/student/quizzes/quiz-details';
+import QuizAttemptStudent from '@/pages/student/quizzes/quiz-attempt';
+import StudentResults from '@/pages/student/results/student-results';
+import ResultDetails from '@/pages/student/results/result-details';
 
 export const router = createBrowserRouter([
     {
@@ -148,7 +153,52 @@ export const router = createBrowserRouter([
                 path: '/student',
                 element: (
                     <RoleRoute
-                        element={<StudentDashboard />}
+                        element={<Student />}
+                        allowedRoles={['student']}
+                    />
+                ),
+            },
+            {
+                path: '/student/quizzes',
+                element: (
+                    <RoleRoute
+                        element={<ShowQuizzesStudent />}
+                        allowedRoles={['student']}
+                    />
+                ),
+            },
+            {
+                path: '/student/quiz/:id',
+                element: (
+                    <RoleRoute
+                        element={<QuizDetailsStudentPage />}
+                        allowedRoles={['student']}
+                    />
+                ),
+            },
+            {
+                path: '/student/quiz/:id/attempt',
+                element: (
+                    <RoleRoute
+                        element={<QuizAttemptStudent />}
+                        allowedRoles={['student']}
+                    />
+                ),
+            },
+            {
+                path: '/student/results',
+                element: (
+                    <RoleRoute
+                        element={<StudentResults />}
+                        allowedRoles={['student']}
+                    />
+                ),
+            },
+            {
+                path: '/student/results/:attemptId',
+                element: (
+                    <RoleRoute
+                        element={<ResultDetails />}
                         allowedRoles={['student']}
                     />
                 ),

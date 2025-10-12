@@ -56,7 +56,7 @@ const signupSchema = z
         password_confirmation: z.string().min(1, {
             message: 'Please confirm your password',
         }),
-        role: z.enum(['admin', 'teacher', 'student'], {
+        role: z.enum(['teacher', 'student'], {
             required_error: 'Please select a role',
         }),
     })
@@ -77,7 +77,7 @@ export function SignupForm() {
             email: '',
             password: '',
             password_confirmation: '',
-            role: 'admin',
+            role: 'teacher',
         },
     });
 
@@ -213,14 +213,14 @@ export function SignupForm() {
                                     <RadioGroup
                                         onValueChange={field.onChange}
                                         defaultValue={field.value}
-                                        className="flex justify-center items-center space-y-1"
+                                        className="flex items-center space-y-1"
                                         disabled={isLoading}>
-                                        <FormItem className="flex items-center space-x-3 space-y-0">
+                                        {/* <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="admin" />
                                             </FormControl>
                                             <FormLabel className="font-normal">Admin</FormLabel>
-                                        </FormItem>
+                                        </FormItem> */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="teacher" />

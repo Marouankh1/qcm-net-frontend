@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useNavigate, useParams } from 'react-router';
 import useQuestionStore from '@/stores/questionStore';
 import { toast } from 'sonner';
+import useQuizStore from '@/stores/quizStore';
 
 function FormAddQuestion() {
     const { id: quizId } = useParams();
@@ -29,10 +30,36 @@ function FormAddQuestion() {
 
     const [questions, setLocalQuestions] = useState([]);
 
+    const { quizzes, fetchQuizzes } = useQuizStore();
+    const [isQuizPublished, setIsQuizPublished] = useState(false);
+
+    const checkQuizStatus = async () => {
+        try {
+            // Fetch quizzes if not already loaded
+            if (quizzes.length === 0) {
+                await fetchQuizzes();
+            }
+
+            // Find the current quiz
+            const currentQuiz = quizzes.find((q) => q.id === parseInt(quizId));
+            if (currentQuiz?.is_published) {
+                setIsQuizPublished(true);
+                toast.error('Cannot modify questions of a published quiz');
+                // Optionally redirect back after a delay
+                setTimeout(() => {
+                    navigate(`/teacher/quiz/${quizId}`);
+                }, 2000);
+            }
+        } catch (error) {
+            console.error('Error checking quiz status:', error);
+        }
+    };
+
     // Load existing questions for this quiz from API on component mount
     useEffect(() => {
         if (quizId) {
             loadQuizData();
+            checkQuizStatus();
         }
     }, [quizId]);
 
@@ -152,6 +179,29 @@ function FormAddQuestion() {
     //     );
     // };
 
+    // const removeAnswer = (questionId, answerId) => {
+    //     setLocalQuestions(
+    //         questions.map((q) => {
+    //             if (q.id === questionId) {
+    //                 const updatedAnswers = q.answers.filter((a) => a.id !== answerId);
+    //                 const wasCorrectAnswer = q.correctAnswerId === answerId;
+
+    //                 return {
+    //                     ...q,
+    //                     answers: updatedAnswers, // Supprimez cette ligne
+    //                     correctAnswerId: wasCorrectAnswer ? '' : q.correctAnswerId,
+    //                     answers: updatedAnswers.map((a) => ({
+    //                         // Gardez seulement cette ligne
+    //                         ...a,
+    //                         isCorrect: wasCorrectAnswer ? false : a.isCorrect,
+    //                     })),
+    //                 };
+    //             }
+    //             return q;
+    //         })
+    //     );
+    // };
+
     const removeAnswer = (questionId, answerId) => {
         setLocalQuestions(
             questions.map((q) => {
@@ -161,10 +211,8 @@ function FormAddQuestion() {
 
                     return {
                         ...q,
-                        answers: updatedAnswers, // Supprimez cette ligne
                         correctAnswerId: wasCorrectAnswer ? '' : q.correctAnswerId,
                         answers: updatedAnswers.map((a) => ({
-                            // Gardez seulement cette ligne
                             ...a,
                             isCorrect: wasCorrectAnswer ? false : a.isCorrect,
                         })),
@@ -207,11 +255,37 @@ function FormAddQuestion() {
         return true;
     };
 
+    if (isQuizPublished) {
+        return (
+            <div className="p-6 mx-3 space-y-4">
+                <div className="flex items-center justify-center h-64">
+                    <div className="text-center">
+                        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4">
+                            <h3 className="font-bold text-lg">Quiz Published</h3>
+                            <p>Cannot add or modify questions for a published quiz.</p>
+                        </div>
+                        <Button
+                            onClick={() => navigate(`/teacher/quiz/${quizId}`)}
+                            variant="default">
+                            Back to Quiz
+                        </Button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const handleSaveQuestions = async (e) => {
         e.preventDefault();
 
         if (!quizId) {
             toast.error('Quiz ID is required');
+            return;
+        }
+
+        // Check if quiz is published before saving
+        if (isQuizPublished) {
+            toast.error('Cannot modify questions of a published quiz');
             return;
         }
 
@@ -245,7 +319,7 @@ function FormAddQuestion() {
                 await refreshQuizData(quizId);
 
                 // Navigate back to quiz page
-                navigate(`/quiz/${quizId}`);
+                navigate(`/teacher/quiz/${quizId}`);
             }
         } catch (error) {
             console.error('Error saving questions:', error);

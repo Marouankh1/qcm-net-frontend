@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { BarChart3, FilePlus2, FileTextIcon, LayoutDashboardIcon, BookOpen, Users } from 'lucide-react';
+import { BarChart3, FilePlus2, FileTextIcon, LayoutDashboardIcon, BookOpen, Users, Play } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
@@ -13,14 +13,14 @@ const navConfig = {
     ],
     teacher: [
         { title: 'Dashboard', url: '/teacher', icon: LayoutDashboardIcon },
-        { title: 'Show Quizzes', url: '/teacher/quizzes', icon: FileTextIcon },
-        { title: 'Create Quizzes', url: '/teacher/quizzes/create', icon: FilePlus2 },
-        { title: 'Student Results', url: '/teacher/student-results', icon: Users }, // Seulement Student Results
+        { title: 'My Quizzes', url: '/teacher/quizzes', icon: FileTextIcon },
+        { title: 'Create Quiz', url: '/teacher/quizzes/create', icon: FilePlus2 },
+        { title: 'Student Results', url: '/teacher/student-results', icon: Users },
     ],
     student: [
         { title: 'Dashboard', url: '/student', icon: LayoutDashboardIcon },
-        { title: 'My Quizzes', url: '/student/quizzes', icon: FileTextIcon },
-        { title: 'Results', url: '/student/results', icon: BarChart3 },
+        { title: 'Available Quizzes', url: '/student/quizzes', icon: Play }, // Changé l'icône et le texte
+        { title: 'My Results', url: '/student/results', icon: BarChart3 },
     ],
 };
 
