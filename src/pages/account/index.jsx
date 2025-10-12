@@ -1,83 +1,57 @@
 import React from 'react';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
-import { AppSidebar } from '@/components/app-sidebar';
-import { Separator } from '@/components/ui/separator';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { User, Mail, Lock, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { useOutlet } from 'react-router';
 import useAuthStore from '@/stores/authStore';
+import useAccountStore from '@/stores/accountStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 
-// Validation schema
-const accountSchema = z
+// Validation schema pour les informations personnelles
+const profileSchema = z.object({
+    firstName: z.string().min(1, 'First name is required').max(50, 'First name is too long'),
+    lastName: z.string().min(1, 'Last name is required').max(50, 'Last name is too long'),
+    email: z.string().email('Invalid email address'),
+});
+
+// Validation schema pour le mot de passe
+const passwordSchema = z
     .object({
-        firstName: z.string().min(1, 'First name is required').max(50, 'First name is too long'),
-        lastName: z.string().min(1, 'Last name is required').max(50, 'Last name is too long'),
-        email: z.email('Invalid email address'),
-        currentPassword: z.string().optional(),
-        newPassword: z.string().optional(),
-        confirmPassword: z.string().optional(),
+        currentPassword: z.string().min(1, 'Current password is required'),
+        newPassword: z.string().min(8, 'Password must be at least 8 characters'),
+        confirmPassword: z.string().min(1, 'Please confirm your password'),
     })
-    .refine(
-        (data) => {
-            // If any password field is filled, all must be filled and new passwords must match
-            if (data.currentPassword || data.newPassword || data.confirmPassword) {
-                return (
-                    data.currentPassword && data.newPassword && data.confirmPassword && data.newPassword === data.confirmPassword
-                );
-            }
-            return true;
-        },
-        {
-            message: 'All password fields are required and new passwords must match',
-            path: ['confirmPassword'],
-        }
-    )
-    .refine(
-        (data) => {
-            // Password strength validation only if changing password
-            if (data.newPassword) {
-                return z.string().min(8, 'Password must be at least 8 characters').safeParse(data.newPassword).success;
-            }
-            return true;
-        },
-        {
-            message: 'Password must be at least 8 characters',
-            path: ['newPassword'],
-        }
-    );
+    .refine((data) => data.newPassword === data.confirmPassword, {
+        message: "Passwords don't match",
+        path: ['confirmPassword'],
+    });
 
 export default function AccountPage() {
     const outlet = useOutlet();
-    const [isLoading, setIsLoading] = useState(false);
-    const { user } = useAuthStore();
+    const { user, login } = useAuthStore();
+    const { isLoading, isPasswordLoading, error, updateProfile, updatePassword, clearError } = useAccountStore();
 
-    // const { user } = useUser();
-
-    // Initialize form with user data from auth store
-    const form = useForm({
-        resolver: zodResolver(accountSchema),
+    // Form for profile information
+    const profileForm = useForm({
+        resolver: zodResolver(profileSchema),
         defaultValues: {
             firstName: user?.first_name || '',
             lastName: user?.last_name || '',
             email: user?.email || '',
+        },
+        mode: 'onChange',
+    });
+
+    // Form for password change
+    const passwordForm = useForm({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: {
             currentPassword: '',
             newPassword: '',
             confirmPassword: '',
@@ -85,62 +59,102 @@ export default function AccountPage() {
         mode: 'onChange',
     });
 
-    // Watch form values to determine if save should be enabled
-    const watchedValues = form.watch();
-    const isDirty = form.formState.isDirty;
-    const hasErrors = Object.keys(form.formState.errors).length > 0;
-
-    // Check if password fields have any value
-    const isChangingPassword = !!(watchedValues.currentPassword || watchedValues.newPassword || watchedValues.confirmPassword);
-
-    // Save button should be enabled only when:
-    // 1. Form is dirty (values changed) AND
-    // 2. No validation errors AND
-    // 3. If changing password, all password fields must be filled
-    const isSaveEnabled =
-        isDirty &&
-        !hasErrors &&
-        (!isChangingPassword || (watchedValues.currentPassword && watchedValues.newPassword && watchedValues.confirmPassword));
-
     // Generate initials from first and last name
     const getInitials = () => {
-        const firstInitial = watchedValues.firstName.charAt(0).toUpperCase();
-        const lastInitial = watchedValues.lastName.charAt(0).toUpperCase();
+        const firstName = profileForm.watch('firstName');
+        const lastName = profileForm.watch('lastName');
+        const firstInitial = firstName.charAt(0).toUpperCase();
+        const lastInitial = lastName.charAt(0).toUpperCase();
         return `${firstInitial}${lastInitial}`;
     };
 
-    const onSubmit = async (data) => {
-        setIsLoading(true);
+    // Handle profile information update
+    const onProfileSubmit = async (data) => {
+        try {
+            clearError();
+            const result = await updateProfile({
+                firstName: data.firstName,
+                lastName: data.lastName,
+            });
 
-        // Prepare data for API call
-        const updateData = {
-            firstName: data.firstName,
-            lastName: data.lastName,
-            ...(isChangingPassword && {
+            if (result.success) {
+                // Update the user in the auth store
+                login(result.data);
+                toast.success('Profile information updated successfully!');
+
+                // Reset form state to reflect new values
+                profileForm.reset({
+                    firstName: result.data.first_name,
+                    lastName: result.data.last_name,
+                    email: result.data.email,
+                });
+            }
+        } catch (error) {
+            console.error('Profile update error:', error);
+
+            // Show validation errors if any
+            if (error.errors) {
+                Object.keys(error.errors).forEach((field) => {
+                    const fieldErrors = error.errors[field];
+                    profileForm.setError(field.toLowerCase(), {
+                        type: 'server',
+                        message: fieldErrors[0],
+                    });
+                });
+            } else {
+                toast.error(error.message);
+            }
+        }
+    };
+
+    // Handle password change
+    const onPasswordSubmit = async (data) => {
+        try {
+            clearError();
+            const result = await updatePassword({
                 currentPassword: data.currentPassword,
                 newPassword: data.newPassword,
-            }),
-        };
+                newPassword_confirmation: data.confirmPassword,
+            });
 
-        console.log('Submitting data:', updateData);
+            if (result.success) {
+                toast.success('Password updated successfully!');
 
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-
-            // Reset password fields on success
-            if (isChangingPassword) {
-                form.reset({
-                    ...form.getValues(),
+                // Reset password form
+                passwordForm.reset({
                     currentPassword: '',
                     newPassword: '',
                     confirmPassword: '',
                 });
             }
+        } catch (error) {
+            console.error('Password update error:', error);
 
-            toast.success('Your account information has been successfully updated.');
-        }, 1000);
+            // Show validation errors if any
+            if (error.errors) {
+                Object.keys(error.errors).forEach((field) => {
+                    const fieldName = field === 'newPassword_confirmation' ? 'confirmPassword' : field;
+                    const fieldErrors = error.errors[field];
+                    passwordForm.setError(fieldName, {
+                        type: 'server',
+                        message: fieldErrors[0],
+                    });
+                });
+            } else {
+                toast.error(error.message);
+            }
+        }
     };
+
+    // Check if profile form has changes
+    const isProfileDirty = profileForm.formState.isDirty;
+    const hasProfileErrors = Object.keys(profileForm.formState.errors).length > 0;
+    const isProfileSaveEnabled = isProfileDirty && !hasProfileErrors;
+
+    // Check if password form is valid and has values
+    const isPasswordValid = passwordForm.formState.isValid;
+    const isPasswordDirty = passwordForm.formState.isDirty;
+    const isPasswordSaveEnabled = isPasswordValid && isPasswordDirty;
 
     return (
         <div className={'w-full h-full'}>
@@ -160,14 +174,17 @@ export default function AccountPage() {
                                         {user.first_name} {user.last_name}
                                     </h1>
                                     <p className="text-muted-foreground">{user.email}</p>
+                                    <p className="text-sm text-muted-foreground capitalize">{user.role}</p>
                                 </div>
                             </div>
 
-                            <Form {...form}>
-                                <form
-                                    onSubmit={form.handleSubmit(onSubmit)}
-                                    className="space-y-6">
-                                    {/* Personal Information */}
+                            {error && (
+                                <div className="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>
+                            )}
+
+                            {/* Personal Information Form */}
+                            <Form {...profileForm}>
+                                <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="flex items-center gap-2">
@@ -181,7 +198,7 @@ export default function AccountPage() {
                                         <CardContent className="space-y-4">
                                             <div className="grid gap-4 sm:grid-cols-2">
                                                 <FormField
-                                                    control={form.control}
+                                                    control={profileForm.control}
                                                     name="firstName"
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-2">
@@ -190,6 +207,7 @@ export default function AccountPage() {
                                                                 <Input
                                                                     placeholder="Enter your first name"
                                                                     {...field}
+                                                                    disabled={isLoading}
                                                                 />
                                                             </FormControl>
                                                             <FormMessage />
@@ -197,7 +215,7 @@ export default function AccountPage() {
                                                     )}
                                                 />
                                                 <FormField
-                                                    control={form.control}
+                                                    control={profileForm.control}
                                                     name="lastName"
                                                     render={({ field }) => (
                                                         <FormItem className="space-y-2">
@@ -206,6 +224,7 @@ export default function AccountPage() {
                                                                 <Input
                                                                     placeholder="Enter your last name"
                                                                     {...field}
+                                                                    disabled={isLoading}
                                                                 />
                                                             </FormControl>
                                                             <FormMessage />
@@ -214,7 +233,7 @@ export default function AccountPage() {
                                                 />
                                             </div>
                                             <FormField
-                                                control={form.control}
+                                                control={profileForm.control}
                                                 name="email"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-2">
@@ -230,28 +249,38 @@ export default function AccountPage() {
                                                                 {...field}
                                                             />
                                                         </FormControl>
+                                                        <FormDescription>Email address cannot be changed.</FormDescription>
                                                         <FormMessage />
                                                     </FormItem>
                                                 )}
                                             />
                                         </CardContent>
+                                        <CardFooter className="flex justify-end border-t pt-4">
+                                            <Button
+                                                type="submit"
+                                                disabled={!isProfileSaveEnabled || isLoading}>
+                                                <Save className="mr-2 h-4 w-4" />
+                                                {isLoading ? 'Saving...' : 'Save Changes'}
+                                            </Button>
+                                        </CardFooter>
                                     </Card>
+                                </form>
+                            </Form>
 
-                                    {/* Change Password */}
+                            {/* Change Password Form */}
+                            <Form {...passwordForm}>
+                                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
                                     <Card>
                                         <CardHeader>
                                             <CardTitle className="flex items-center gap-2">
                                                 <Lock className="h-5 w-5" />
                                                 Change Password
                                             </CardTitle>
-                                            <CardDescription>
-                                                Update your password to keep your account secure. Leave blank to keep current
-                                                password.
-                                            </CardDescription>
+                                            <CardDescription>Update your password to keep your account secure.</CardDescription>
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             <FormField
-                                                control={form.control}
+                                                control={passwordForm.control}
                                                 name="currentPassword"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-2">
@@ -261,6 +290,7 @@ export default function AccountPage() {
                                                                 type="password"
                                                                 placeholder="Enter your current password"
                                                                 {...field}
+                                                                disabled={isPasswordLoading}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -268,7 +298,7 @@ export default function AccountPage() {
                                                 )}
                                             />
                                             <FormField
-                                                control={form.control}
+                                                control={passwordForm.control}
                                                 name="newPassword"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-2">
@@ -278,6 +308,7 @@ export default function AccountPage() {
                                                                 type="password"
                                                                 placeholder="Enter your new password"
                                                                 {...field}
+                                                                disabled={isPasswordLoading}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -285,7 +316,7 @@ export default function AccountPage() {
                                                 )}
                                             />
                                             <FormField
-                                                control={form.control}
+                                                control={passwordForm.control}
                                                 name="confirmPassword"
                                                 render={({ field }) => (
                                                     <FormItem className="space-y-2">
@@ -295,6 +326,7 @@ export default function AccountPage() {
                                                                 type="password"
                                                                 placeholder="Confirm your new password"
                                                                 {...field}
+                                                                disabled={isPasswordLoading}
                                                             />
                                                         </FormControl>
                                                         <FormMessage />
@@ -302,18 +334,15 @@ export default function AccountPage() {
                                                 )}
                                             />
                                         </CardContent>
+                                        <CardFooter className="flex justify-end border-t pt-4">
+                                            <Button
+                                                type="submit"
+                                                disabled={!isPasswordSaveEnabled || isPasswordLoading}>
+                                                <Save className="mr-2 h-4 w-4" />
+                                                {isPasswordLoading ? 'Updating...' : 'Update Password'}
+                                            </Button>
+                                        </CardFooter>
                                     </Card>
-
-                                    {/* Save Button */}
-                                    <div className="flex justify-end">
-                                        <Button
-                                            type="submit"
-                                            size="lg"
-                                            disabled={!isSaveEnabled || isLoading}>
-                                            <Save className="mr-2 h-4 w-4" />
-                                            {isLoading ? 'Saving...' : 'Save Changes'}
-                                        </Button>
-                                    </div>
                                 </form>
                             </Form>
                         </div>
