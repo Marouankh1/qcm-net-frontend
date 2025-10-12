@@ -8,8 +8,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import React from 'react';
 import useAuthStore from '@/stores/authStore';
-import { useCreateQuiz } from '@/hooks/react-query/quizzes/useQuiz';
+import useQuizStore from '@/stores/quizStore';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 const quizFormSchema = z.object({
     title: z
@@ -30,7 +31,7 @@ const defaultValues = {
 
 function AddQuizForm() {
     const { user } = useAuthStore();
-    const createQuizMutation = useCreateQuiz();
+    const { createQuiz, isLoading, error, clearError } = useQuizStore();
     const navigate = useNavigate();
 
     const form = useForm({
@@ -40,18 +41,25 @@ function AddQuizForm() {
 
     async function onSubmit(data) {
         try {
+            clearError();
+
             if (!user?.id) {
+                toast.error('User not found. Please log in again.');
                 return;
             }
-            const quizzeData = { ...data, teacher_id: user.id };
 
-            const result = await createQuizMutation.mutateAsync(quizzeData);
-            if (result.data.success) {
+            const quizData = { ...data, teacher_id: user.id };
+            const result = await createQuiz(quizData);
+
+            if (result.success) {
+                toast.success('Quiz created successfully!');
                 form.reset();
                 navigate('/teacher/quizzes');
             }
         } catch (error) {
-            // Error is already handled in the mutation
+            console.error('Error creating quiz:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'Failed to create quiz';
+            toast.error(errorMessage);
         }
     }
 
@@ -62,6 +70,8 @@ function AddQuizForm() {
                 <CardDescription>Basic details about your quiz</CardDescription>
             </CardHeader>
             <CardContent>
+                {error && <div className="mb-4 p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>}
+
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
@@ -76,6 +86,7 @@ function AddQuizForm() {
                                         <Input
                                             placeholder="e.g., Network Protocols Fundamentals"
                                             {...field}
+                                            disabled={isLoading}
                                         />
                                     </FormControl>
                                     <FormDescription>Enter a descriptive title for your quiz</FormDescription>
@@ -91,9 +102,10 @@ function AddQuizForm() {
                                     <FormLabel>Description</FormLabel>
                                     <FormControl>
                                         <Textarea
-                                            placeholder="Enter a description for your quiz (optional)"
+                                            placeholder="Enter a description for your quiz"
                                             className="min-h-[100px]"
                                             {...field}
+                                            disabled={isLoading}
                                         />
                                     </FormControl>
                                     <FormDescription>Provide additional context or instructions for the quiz</FormDescription>
@@ -105,8 +117,8 @@ function AddQuizForm() {
                             <Button
                                 type="submit"
                                 className={'cursor-pointer disabled:cursor-none'}
-                                disabled={!form.formState.isValid || createQuizMutation.isPending}>
-                                {form.formState.isSubmitting ? 'Publishing...' : 'Publish Quiz'}
+                                disabled={!form.formState.isValid || isLoading}>
+                                {isLoading ? 'Creating...' : 'Create Quiz'}
                             </Button>
                         </div>
                     </form>

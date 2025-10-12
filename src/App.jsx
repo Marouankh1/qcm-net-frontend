@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarContent, SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { useLogout } from '@/hooks/react-query/auth/useAuth';
 import useAuthStore from '@/stores/authStore';
@@ -28,7 +28,8 @@ function App() {
             />
             <SidebarProvider>
                 <AppSidebar />
-                <main className="w-full h-screen overflow-x-hidden">
+                {/* <main className="w-full h-screen overflow-hidden "> */}
+                <SidebarContent>
                     <Outlet />
                     {/* <Button
                         className="cursor-pointer disabled:cursor-none"
@@ -36,7 +37,7 @@ function App() {
                         onClick={() => handleLogOut()}>
                         {isLoading ? 'Logout ...' : 'Logout'}
                     </Button> */}
-                </main>
+                </SidebarContent>
             </SidebarProvider>
             {/* <SidebarProvider>
                 <AppSidebar />
