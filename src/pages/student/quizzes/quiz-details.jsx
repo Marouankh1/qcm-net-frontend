@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import useStudentStore from '@/stores/studentStore';
-import { ArrowLeft, Clock, BookOpen, AlertTriangle, Play } from 'lucide-react';
+import { ArrowLeft, Clock, BookOpen, AlertTriangle, Play, Ban } from 'lucide-react';
 import { toast } from 'sonner';
 import Header from '@/components/header';
 
@@ -30,7 +30,7 @@ function QuizDetailsStudentPage() {
     };
 
     const handleStartQuiz = async () => {
-        if (!currentQuiz) return;
+        if (!currentQuiz || !currentQuiz.hasQuestions) return;
 
         setIsStarting(true);
         try {
@@ -43,6 +43,16 @@ function QuizDetailsStudentPage() {
             setIsStarting(false);
         }
     };
+
+    // Redirect if quiz has no questions
+    useEffect(() => {
+        if (currentQuiz && !currentQuiz.hasQuestions) {
+            toast.error('This quiz has no questions available.');
+            setTimeout(() => {
+                navigate('/student/quizzes');
+            }, 2000);
+        }
+    }, [currentQuiz, navigate]);
 
     if (isLoading) {
         return (
@@ -73,6 +83,50 @@ function QuizDetailsStudentPage() {
             </div>
         );
     }
+
+    // Show redirect message if quiz has no questions
+    if (!currentQuiz.hasQuestions) {
+        return (
+            <div>
+                <Header title="Quiz Details" />
+                <div className="p-6 mx-3 space-y-6">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => navigate('/student/quizzes')}>
+                                <ArrowLeft className="h-4 w-4" />
+                            </Button>
+                            <div>
+                                <h1 className="text-3xl font-bold tracking-tight">{currentQuiz.title}</h1>
+                                <p className="text-muted-foreground">{currentQuiz.description}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <Card className="border-yellow-200 bg-yellow-50">
+                        <CardContent className="pt-6">
+                            <div className="text-center space-y-4">
+                                <Ban className="h-12 w-12 text-yellow-500 mx-auto" />
+                                <h3 className="text-xl font-semibold text-yellow-800">Quiz Not Available</h3>
+                                <p className="text-yellow-700">
+                                    This quiz has no questions available. Redirecting to available quizzes...
+                                </p>
+                                <Button
+                                    onClick={() => navigate('/student/quizzes')}
+                                    variant="outline">
+                                    Go to Available Quizzes
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        );
+    }
+
+    const questionCount = currentQuiz.questions?.length || 0;
 
     return (
         <div>
@@ -106,7 +160,7 @@ function QuizDetailsStudentPage() {
                         <CardContent className="space-y-4">
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Questions:</span>
-                                <span className="font-medium">{currentQuiz.questions_count || 0}</span>
+                                <span className="font-medium">{questionCount}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-muted-foreground">Duration:</span>
@@ -157,16 +211,19 @@ function QuizDetailsStudentPage() {
                         <div className="text-center space-y-4">
                             <h3 className="text-xl font-semibold">Ready to start the quiz?</h3>
                             <p className="text-muted-foreground">
-                                Once you start, the timer will begin and you'll need to complete all questions.
+                                Once you start, the timer will begin and you'll need to complete all {questionCount} questions.
                             </p>
                             <Button
                                 size="lg"
                                 onClick={handleStartQuiz}
-                                disabled={isStarting || isLoading}
-                                className="gap-2">
+                                disabled={isStarting || isLoading || questionCount === 0}
+                                className="gap-2 cursor-pointer">
                                 <Play className="h-5 w-5" />
-                                {isStarting ? 'Starting...' : 'Start Quiz'}
+                                {isStarting ? 'Starting...' : questionCount === 0 ? 'No Questions Available' : 'Start Quiz'}
                             </Button>
+                            {questionCount === 0 && (
+                                <p className="text-sm text-red-500">This quiz cannot be started because it has no questions.</p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

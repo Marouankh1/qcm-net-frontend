@@ -37,14 +37,14 @@ function QuizAttemptStudent() {
         }
     }, [id]);
 
-    useEffect(() => {
-        if (timeLeft > 0) {
-            const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-            return () => clearTimeout(timer);
-        } else {
-            handleAutoSubmit();
-        }
-    }, [timeLeft]);
+    // useEffect(() => {
+    //     if (timeLeft > 0) {
+    //         const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    //         return () => clearTimeout(timer);
+    //     } else {
+    //         handleAutoSubmit();
+    //     }
+    // }, [timeLeft]);
 
     useEffect(() => {
         if (attempt) {
@@ -164,7 +164,15 @@ function QuizAttemptStudent() {
     const progress = ((currentQuestionIndex + 1) / (currentQuiz?.questions?.length || 1)) * 100;
     const isLastQuestion = currentQuestionIndex === (currentQuiz?.questions?.length || 0) - 1;
 
-    if (isLoading || !currentQuiz || !attempt) {
+    useEffect(() => {
+        if (currentQuiz && (!currentQuiz.questions || currentQuiz.questions.length === 0)) {
+            toast.error('This quiz has no questions available.');
+            navigate('/student/quizzes');
+            return;
+        }
+    }, [currentQuiz, navigate]);
+
+    if (isLoading || !currentQuiz || !attempt || !currentQuiz.questions || currentQuiz.questions.length === 0) {
         return (
             <div>
                 <Header title="Taking Quiz" />
@@ -222,19 +230,19 @@ function QuizAttemptStudent() {
                                 {currentQuestionIndex + 1}
                             </span>
                             <div>
-                                {currentQuestion.question_text}
+                                {currentQuestion?.question_text}
                                 <CardDescription className="mt-2">
-                                    {currentQuestion.points} point{currentQuestion.points !== 1 ? 's' : ''}
+                                    {currentQuestion?.points} point{currentQuestion?.points !== 1 ? 's' : ''}
                                 </CardDescription>
                             </div>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <RadioGroup
-                            value={selectedAnswers[currentQuestion.id] || ''}
-                            onValueChange={(value) => handleAnswerSelect(currentQuestion.id, value)}
+                            value={selectedAnswers[currentQuestion?.id] || ''}
+                            onValueChange={(value) => handleAnswerSelect(currentQuestion?.id, value)}
                             className="space-y-3">
-                            {currentQuestion.choices.map((choice, index) => (
+                            {currentQuestion?.choices.map((choice, index) => (
                                 <div
                                     key={choice.id}
                                     className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-accent transition-colors">

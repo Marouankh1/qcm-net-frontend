@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import useStudentStore from '@/stores/studentStore';
-import { BookOpen, Clock, Users, Search, Play, RefreshCw, User } from 'lucide-react';
+import { BookOpen, Clock, Users, Search, Play, RefreshCw, User, Ban } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
@@ -44,11 +44,28 @@ function ShowQuizzesStudent() {
         loadQuizzes();
     };
 
-    const filteredQuizzes = availableQuizzes.filter(
-        (quiz) =>
-            quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            quiz.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter quizzes and check if they have questions
+    const filteredQuizzes = availableQuizzes
+        .filter(
+            (quiz) =>
+                quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                quiz.description.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .map((quiz) => ({
+            ...quiz,
+            hasQuestions: (quiz.questions_count && quiz.questions_count > 0) || (quiz.questions && quiz.questions.length > 0),
+        }));
+
+    const canStartQuiz = (quiz) => {
+        return (quiz.questions_count && quiz.questions_count > 0) || (quiz.questions && quiz.questions.length > 0);
+    };
+
+    const handleQuizCardClick = (quiz, e) => {
+        if (!canStartQuiz(quiz)) {
+            e.preventDefault();
+            toast.error('This quiz has no questions available');
+        }
+    };
 
     return (
         <div>
@@ -145,47 +162,90 @@ function ShowQuizzesStudent() {
                         </div>
 
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {filteredQuizzes.map((quiz) => (
-                                <Card
-                                    key={quiz.id}
-                                    className="flex flex-col hover:shadow-lg transition-shadow">
-                                    <CardHeader>
-                                        <CardTitle className="text-xl leading-tight">{quiz.title}</CardTitle>
-                                        <CardDescription className="mt-2 line-clamp-3">{quiz.description}</CardDescription>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 space-y-3">
-                                        <div className="grid grid-cols-2 gap-4 text-sm">
-                                            <div className="flex items-center gap-2 text-muted-foreground">
-                                                <BookOpen className="h-4 w-4" />
-                                                <span>{quiz.questions_count || 0} questions</span>
+                            {filteredQuizzes.map((quiz) => {
+                                const hasQuestions = canStartQuiz(quiz);
+                                const questionCount = quiz.questions_count || (quiz.questions ? quiz.questions.length : 0);
+
+                                return (
+                                    <Card
+                                        key={quiz.id}
+                                        className={`flex flex-col hover:shadow-lg transition-shadow ${
+                                            !hasQuestions ? 'opacity-70 border-yellow-200 bg-yellow-50' : ''
+                                        }`}>
+                                        <CardHeader>
+                                            <CardTitle className="text-xl leading-tight">{quiz.title}</CardTitle>
+                                            <CardDescription className="mt-2 line-clamp-3">{quiz.description}</CardDescription>
+                                        </CardHeader>
+                                        <CardContent className="flex-1 space-y-3">
+                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                <div
+                                                    className={`flex items-center gap-2 ${
+                                                        !hasQuestions ? 'text-yellow-600' : 'text-muted-foreground'
+                                                    }`}>
+                                                    <BookOpen className="h-4 w-4" />
+                                                    <span>
+                                                        {questionCount} question{questionCount !== 1 ? 's' : ''}
+                                                        {!hasQuestions && ' (None)'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <Clock className="h-4 w-4" />
+                                                    <span>{quiz.duration || 30} min</span>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2 text-muted-foreground">
-                                                <Clock className="h-4 w-4" />
-                                                <span>{quiz.duration || 30} min</span>
-                                            </div>
-                                        </div>
-                                        {quiz.teacher && (
-                                            <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2 border-t">
-                                                <User className="h-4 w-4" />
-                                                <span>
-                                                    By {quiz.teacher.first_name} {quiz.teacher.last_name}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                    <CardFooter>
-                                        <Link
-                                            to={`/student/quiz/${quiz.id}`}
-                                            className="w-full">
-                                            <Button className="w-full gap-2">
-                                                <Play className="h-4 w-4" />
-                                                Start Quiz
-                                            </Button>
-                                        </Link>
-                                    </CardFooter>
-                                </Card>
-                            ))}
+                                            {quiz.teacher && (
+                                                <div className="flex items-center gap-2 text-sm text-muted-foreground pt-2 border-t">
+                                                    <User className="h-4 w-4" />
+                                                    <span>
+                                                        By {quiz.teacher.first_name} {quiz.teacher.last_name}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {!hasQuestions && (
+                                                <div className="flex items-center gap-2 text-sm text-yellow-600 pt-2">
+                                                    <Ban className="h-4 w-4" />
+                                                    <span>No questions available</span>
+                                                </div>
+                                            )}
+                                        </CardContent>
+                                        <CardFooter>
+                                            {hasQuestions ? (
+                                                <Link
+                                                    to={`/student/quiz/${quiz.id}`}
+                                                    className="w-full">
+                                                    <Button
+                                                        className="w-full gap-2 cursor-pointer"
+                                                        onClick={(e) => handleQuizCardClick(quiz, e)}>
+                                                        <Play className="h-4 w-4" />
+                                                        Start Quiz
+                                                    </Button>
+                                                </Link>
+                                            ) : (
+                                                <Button
+                                                    className="w-full gap-2 cursor-not-allowed"
+                                                    variant="outline"
+                                                    disabled>
+                                                    <Ban className="h-4 w-4" />
+                                                    Cannot Start
+                                                </Button>
+                                            )}
+                                        </CardFooter>
+                                    </Card>
+                                );
+                            })}
                         </div>
+
+                        {/* Show warning if there are quizzes with no questions */}
+                        {filteredQuizzes.some((quiz) => !canStartQuiz(quiz)) && (
+                            <div className="mt-4 p-4 border border-yellow-200 bg-yellow-50 rounded-lg">
+                                <div className="flex items-center gap-2 text-yellow-800">
+                                    <Ban className="h-4 w-4" />
+                                    <span className="text-sm">
+                                        Some quizzes cannot be started because they have no questions.
+                                    </span>
+                                </div>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
