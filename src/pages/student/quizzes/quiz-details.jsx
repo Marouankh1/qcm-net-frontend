@@ -30,7 +30,7 @@ function QuizDetailsStudentPage() {
     };
 
     const handleStartQuiz = async () => {
-        if (!currentQuiz || !currentQuiz.hasQuestions) return;
+        // if (!currentQuiz || !currentQuiz.hasQuestions) return;
 
         setIsStarting(true);
         try {
@@ -45,14 +45,14 @@ function QuizDetailsStudentPage() {
     };
 
     // Redirect if quiz has no questions
-    useEffect(() => {
-        if (currentQuiz && !currentQuiz.hasQuestions) {
-            toast.error('This quiz has no questions available.');
-            setTimeout(() => {
-                navigate('/student/quizzes');
-            }, 2000);
-        }
-    }, [currentQuiz, navigate]);
+    // useEffect(() => {
+    //     if (currentQuiz && !currentQuiz.hasQuestions) {
+    //         toast.error('This quiz has no questions available.');
+    //         setTimeout(() => {
+    //             navigate('/student/quizzes');
+    //         }, 2000);
+    //     }
+    // }, [currentQuiz, navigate]);
 
     if (isLoading) {
         return (
@@ -85,46 +85,46 @@ function QuizDetailsStudentPage() {
     }
 
     // Show redirect message if quiz has no questions
-    if (!currentQuiz.hasQuestions) {
-        return (
-            <div>
-                <Header title="Quiz Details" />
-                <div className="p-6 mx-3 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => navigate('/student/quizzes')}>
-                                <ArrowLeft className="h-4 w-4" />
-                            </Button>
-                            <div>
-                                <h1 className="text-3xl font-bold tracking-tight">{currentQuiz.title}</h1>
-                                <p className="text-muted-foreground">{currentQuiz.description}</p>
-                            </div>
-                        </div>
-                    </div>
+    // if (!currentQuiz.hasQuestions) {
+    //     return (
+    //         <div>
+    //             <Header title="Quiz Details" />
+    //             <div className="p-6 mx-3 space-y-6">
+    //                 <div className="flex items-center justify-between">
+    //                     <div className="flex items-center gap-4">
+    //                         <Button
+    //                             variant="outline"
+    //                             size="icon"
+    //                             onClick={() => navigate('/student/quizzes')}>
+    //                             <ArrowLeft className="h-4 w-4" />
+    //                         </Button>
+    //                         <div>
+    //                             <h1 className="text-3xl font-bold tracking-tight">{currentQuiz.title}</h1>
+    //                             <p className="text-muted-foreground">{currentQuiz.description}</p>
+    //                         </div>
+    //                     </div>
+    //                 </div>
 
-                    <Card className="border-yellow-200 bg-yellow-50">
-                        <CardContent className="pt-6">
-                            <div className="text-center space-y-4">
-                                <Ban className="h-12 w-12 text-yellow-500 mx-auto" />
-                                <h3 className="text-xl font-semibold text-yellow-800">Quiz Not Available</h3>
-                                <p className="text-yellow-700">
-                                    This quiz has no questions available. Redirecting to available quizzes...
-                                </p>
-                                <Button
-                                    onClick={() => navigate('/student/quizzes')}
-                                    variant="outline">
-                                    Go to Available Quizzes
-                                </Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-            </div>
-        );
-    }
+    //                 <Card className="border-yellow-200 bg-yellow-50">
+    //                     <CardContent className="pt-6">
+    //                         <div className="text-center space-y-4">
+    //                             <Ban className="h-12 w-12 text-yellow-500 mx-auto" />
+    //                             <h3 className="text-xl font-semibold text-yellow-800">Quiz Not Available</h3>
+    //                             <p className="text-yellow-700">
+    //                                 This quiz has no questions available. Redirecting to available quizzes...
+    //                             </p>
+    //                             <Button
+    //                                 onClick={() => navigate('/student/quizzes')}
+    //                                 variant="outline">
+    //                                 Go to Available Quizzes
+    //                             </Button>
+    //                         </div>
+    //                     </CardContent>
+    //                 </Card>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     const questionCount = currentQuiz.questions?.length || 0;
 
