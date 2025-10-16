@@ -149,15 +149,17 @@ function StudentContent() {
                         <div className="grid gap-2">
                             <Link to="/student/quizzes">
                                 <Button
-                                    className="w-full justify-start gap-2"
+                                    className="w-full justify-start gap-2 cursor-pointer"
                                     variant="outline">
                                     <BookOpen className="h-4 w-4" />
                                     Browse Available Quizzes
                                 </Button>
                             </Link>
-                            <Link to="/student/results">
+                            <Link
+                                to="/student/results"
+                                className="cursor-pointer">
                                 <Button
-                                    className="w-full justify-start gap-2"
+                                    className="w-full justify-start gap-2 cursor-pointer"
                                     variant="outline">
                                     <TrendingUp className="h-4 w-4" />
                                     View My Results

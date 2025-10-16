@@ -187,7 +187,7 @@ function QuizzesList() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8"
+                                                    className="h-8 w-8 cursor-pointer"
                                                     disabled={isLoading}>
                                                     <MoreVertical className="h-4 w-4" />
                                                 </Button>
@@ -196,7 +196,7 @@ function QuizzesList() {
                                                 <DropdownMenuItem asChild>
                                                     <Link
                                                         to={`/teacher/quiz/${quiz.id}`}
-                                                        className="flex items-center gap-2 w-full">
+                                                        className="flex items-center gap-2 w-full cursor-pointer">
                                                         <Eye className="h-4 w-4" />
                                                         View Details
                                                     </Link>
@@ -204,7 +204,7 @@ function QuizzesList() {
                                                 <DropdownMenuItem asChild>
                                                     <Link
                                                         to={`/teacher/quiz/${quiz.id}/questions/create`}
-                                                        className="flex items-center gap-2 w-full">
+                                                        className="flex items-center gap-2 w-full cursor-pointer">
                                                         <FileQuestionMark className="h-4 w-4" />
                                                         Add Questions
                                                     </Link>

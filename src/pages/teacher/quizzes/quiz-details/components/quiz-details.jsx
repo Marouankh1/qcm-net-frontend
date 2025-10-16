@@ -217,6 +217,7 @@ function QuizDetails() {
                 <div className="flex gap-2">
                     <Button
                         variant="outline"
+                        className={'cursor-pointer'}
                         onClick={() => navigate('/teacher/quizzes')}>
                         Back to Quizzes
                     </Button>
@@ -235,7 +236,7 @@ function QuizDetails() {
                             <Button
                                 onClick={handleEditQuiz}
                                 variant="outline"
-                                className="gap-2"
+                                className="gap-2 cursor-pointer"
                                 disabled={isEditingQuestions}>
                                 <Edit className="h-4 w-4" />
                                 Edit Quiz
@@ -245,13 +246,13 @@ function QuizDetails() {
                                 <Button
                                     onClick={handleCancelEditQuiz}
                                     variant="outline"
-                                    className="gap-2">
+                                    className="gap-2 cursor-pointer">
                                     <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
                                 <Button
                                     onClick={handleSaveQuiz}
-                                    className="gap-2">
+                                    className="gap-2 cursor-pointer">
                                     <Save className="h-4 w-4" />
                                     Save Changes
                                 </Button>
@@ -314,26 +315,28 @@ function QuizDetails() {
                             <CardDescription>Questions and multiple choice answers for this quiz</CardDescription>
                         </div>
                         {!isPublished && !isEditingQuestions ? (
-                            <Button
-                                onClick={handleEditQuestions}
-                                variant="outline"
-                                className="gap-2"
-                                disabled={isEditing}>
-                                <Edit className="h-4 w-4" />
-                                Edit Questions
-                            </Button>
+                            questions.length > 0 && (
+                                <Button
+                                    onClick={handleEditQuestions}
+                                    variant="outline"
+                                    className="gap-2 cursor-pointer"
+                                    disabled={isEditing}>
+                                    <Edit className="h-4 w-4" />
+                                    Edit Questions
+                                </Button>
+                            )
                         ) : !isPublished && isEditingQuestions ? (
                             <div className="flex gap-2">
                                 <Button
                                     onClick={handleCancelEditQuestions}
                                     variant="outline"
-                                    className="gap-2">
+                                    className="gap-2 cursor-pointer">
                                     <X className="h-4 w-4" />
                                     Cancel
                                 </Button>
                                 <Button
                                     onClick={handleSaveQuestions}
-                                    className="gap-2">
+                                    className="gap-2 cursor-pointer">
                                     <Save className="h-4 w-4" />
                                     Save Questions
                                 </Button>
@@ -349,7 +352,7 @@ function QuizDetails() {
                                 {!isPublished && (
                                     <Button
                                         variant="outline"
-                                        className="mt-4"
+                                        className="mt-4 cursor-pointer"
                                         onClick={() => navigate(`/teacher/quiz/${quizId}/questions/create`)}>
                                         Add Questions
                                     </Button>
@@ -390,7 +393,7 @@ function QuizDetails() {
                                                             value={answer.id}
                                                             checked={question.correctAnswerId === answer.id}
                                                             onChange={() => handleCorrectAnswerChange(question.id, answer.id)}
-                                                            className="h-4 w-4 text-primary focus:ring-primary"
+                                                            className="h-4 w-4 text-primary focus:ring-primary cursor-pointer"
                                                         />
                                                     ) : (
                                                         <div
@@ -426,10 +429,18 @@ function QuizDetails() {
             <div className="flex gap-3 justify-end border-t pt-6">
                 <Button
                     variant="outline"
+                    className={'cursor-pointer'}
                     onClick={() => navigate('/teacher/quizzes')}>
                     Back to Quizzes
                 </Button>
-                {!isPublished && <Button onClick={handlePublishToggle}>Publish Quiz</Button>}
+                {!isPublished && (
+                    <Button
+                        disabled={questions.length === 0}
+                        className={'cursor-pointer'}
+                        onClick={handlePublishToggle}>
+                        Publish Quiz
+                    </Button>
+                )}
             </div>
         </div>
     );
