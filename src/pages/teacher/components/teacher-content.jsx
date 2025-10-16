@@ -96,13 +96,13 @@ function TeacherContent() {
                             ) : (
                                 <div className="text-2xl font-bold">{stats.total_quizzes}</div>
                             )}
-                            <p className={`text-xs ${getGrowthColor(stats.growth_metrics.quizzes_growth)}`}>
+                            <div className={`text-xs ${getGrowthColor(stats.growth_metrics.quizzes_growth)}`}>
                                 {isLoading ? (
                                     <Skeleton className="h-4 w-24" />
                                 ) : (
                                     `${formatGrowth(stats.growth_metrics.quizzes_growth)} from last month`
                                 )}
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
 
@@ -118,9 +118,9 @@ function TeacherContent() {
                             ) : (
                                 <div className="text-2xl font-bold">{stats.active_students}</div>
                             )}
-                            <p className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground">
                                 {isLoading ? <Skeleton className="h-4 w-24" /> : 'Students participated in your quizzes'}
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
 
@@ -136,9 +136,9 @@ function TeacherContent() {
                             ) : (
                                 <div className="text-2xl font-bold">{stats.completion_rate}%</div>
                             )}
-                            <p className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground">
                                 {isLoading ? <Skeleton className="h-4 w-24" /> : 'Of quiz attempts completed'}
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
 
@@ -154,9 +154,9 @@ function TeacherContent() {
                             ) : (
                                 <div className="text-2xl font-bold">{stats.average_score}%</div>
                             )}
-                            <p className="text-xs text-muted-foreground">
+                            <div className="text-xs text-muted-foreground">
                                 {isLoading ? <Skeleton className="h-4 w-24" /> : 'Average across all quizzes'}
-                            </p>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
