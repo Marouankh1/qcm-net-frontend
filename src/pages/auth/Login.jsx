@@ -10,14 +10,6 @@ import { Navigate } from 'react-router';
 export function Login({ className, ...props }) {
     const { isAuthenticated } = useAuthStore();
 
-    // Redirect if user is already logged in
-    // useEffect(() => {
-    //     if (user) {
-    //         const redirectPath = user.role === 'teacher' ? '/teacher' : user.role === 'admin' ? '/admin' : '/student';
-    //         navigate(redirectPath, { replace: true });
-    //     }
-    // }, [user, navigate]);
-
     if (isAuthenticated) {
         return (
             <Navigate
@@ -32,7 +24,6 @@ export function Login({ className, ...props }) {
             <title>QCM NET - Login</title>
             <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
                 <Toaster
-                    // closeButton={true}
                     richColors
                     toastOptions={{}}
                 />

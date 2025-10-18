@@ -8,6 +8,8 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import useAuthStore from '@/stores/authStore';
 import { toast } from 'sonner';
+import { FormErrors } from './form-errors';
+import { useState } from 'react';
 
 const signupSchema = z
     .object({
@@ -39,7 +41,7 @@ const signupSchema = z
             .regex(/^[a-zA-Z\s]+$/, {
                 message: 'Last name can only contain letters and spaces',
             }),
-        email: z.string().email({
+        email: z.email({
             message: 'Please enter a valid email address',
         }),
         password: z
@@ -66,7 +68,8 @@ const signupSchema = z
     });
 
 export function SignupForm() {
-    const { signupUser, isLoading, error, clearError } = useAuthStore();
+    const [apiErrors, setApiErrors] = useState({});
+    const { signupUser, isLoading, clearError } = useAuthStore();
     const navigate = useNavigate();
 
     const form = useForm({
@@ -82,10 +85,9 @@ export function SignupForm() {
     });
 
     const onSubmit = async (credentials) => {
-        console.log('onSubmit ===> credentials', credentials);
-
         try {
             clearError();
+            setApiErrors({});
             const result = await signupUser(credentials);
 
             if (result.success) {
@@ -93,20 +95,19 @@ export function SignupForm() {
                 navigate('/');
             }
         } catch (error) {
-            console.error('Signup error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Signup failed';
-            toast.error(errorMessage);
-        }
-    };
 
-    const handleGoogleLogin = () => {
-        console.log('Google login clicked');
+            if (error.response?.data?.errors) {
+                setApiErrors(error.response.data.errors);
+            } else {
+                toast.error(errorMessage);
+            }
+        }
     };
 
     return (
         <div className="w-full max-w-sm mx-auto space-y-4">
-            {error && <div className="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>}
-
+            <FormErrors errors={apiErrors} />
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
@@ -215,12 +216,6 @@ export function SignupForm() {
                                         defaultValue={field.value}
                                         className="flex items-center space-y-1"
                                         disabled={isLoading}>
-                                        {/* <FormItem className="flex items-center space-x-3 space-y-0">
-                                            <FormControl>
-                                                <RadioGroupItem value="admin" />
-                                            </FormControl>
-                                            <FormLabel className="font-normal">Admin</FormLabel>
-                                        </FormItem> */}
                                         <FormItem className="flex items-center space-x-3 space-y-0">
                                             <FormControl>
                                                 <RadioGroupItem value="teacher" />

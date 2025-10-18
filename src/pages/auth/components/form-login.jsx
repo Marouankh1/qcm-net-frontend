@@ -10,7 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
-    email: z.string().email({ message: 'Invalid email address' }),
+    email: z.email({ message: 'Invalid email address' }),
     password: z
         .string()
         .min(1, {
@@ -22,7 +22,7 @@ const loginSchema = z.object({
 });
 
 function FormLogin() {
-    const { loginUser, isLoading, error, clearError } = useAuthStore();
+    const { loginUser, isLoading, clearError } = useAuthStore();
     const navigate = useNavigate();
 
     const form = useForm({
@@ -37,26 +37,20 @@ function FormLogin() {
         try {
             clearError();
             const result = await loginUser(credentials);
-
             if (result.success) {
-                toast.success(result.message || 'Login successful!');
                 navigate('/');
+                setTimeout(() => {
+                    toast.success(result.message || 'Login successful!');
+                }, 1500);
             }
         } catch (error) {
-            console.error('Login error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Login failed';
             toast.error(errorMessage);
         }
     };
 
-    const handleGoogleLogin = () => {
-        console.log('Google login clicked');
-    };
-
     return (
         <div className="w-full max-w-sm mx-auto space-y-6 font-poppins">
-            {error && <div className="p-4 text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg">{error}</div>}
-
             <Form {...form}>
                 <form
                     onSubmit={form.handleSubmit(onSubmit)}
