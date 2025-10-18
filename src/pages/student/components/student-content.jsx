@@ -59,7 +59,6 @@ function StudentContent() {
 
     return (
         <div className="flex flex-1 flex-col gap-4 px-8 py-6 pt-0">
-            {/* Header with refresh button */}
             <div className="flex justify-between items-center mt-4">
                 <div>
                     <h2 className="text-2xl font-bold tracking-tight">Welcome to QCM-Net</h2>
@@ -74,7 +73,6 @@ function StudentContent() {
                 </Button>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -137,9 +135,7 @@ function StudentContent() {
                 </Card>
             </div>
 
-            {/* Quick Actions & Recent Attempts */}
             <div className="grid gap-4 md:grid-cols-2">
-                {/* Quick Actions */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Quick Actions</CardTitle>
@@ -169,7 +165,6 @@ function StudentContent() {
                     </CardContent>
                 </Card>
 
-                {/* Recent Attempts */}
                 <Card>
                     <CardHeader>
                         <CardTitle>Recent Attempts</CardTitle>

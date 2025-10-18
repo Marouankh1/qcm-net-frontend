@@ -25,7 +25,7 @@ import StudentDetailPage from '@/pages/teacher/student-results/student-detail';
 import QuizResultsDetailPage from '@/pages/teacher/student-results/quiz-results-detail';
 import { QuizPublishCheck } from './quiz-publish-check';
 import Student from '@/pages/student/student';
-import ShowQuizzesStudent from '@/pages/student/quizzes/show-quizzes';
+import ShowQuizzesStudent from '@/pages/student/quizzes/show-quizzes/index';
 import QuizDetailsStudentPage from '@/pages/student/quizzes/quiz-details';
 import QuizAttemptStudent from '@/pages/student/quizzes/quiz-attempt';
 import StudentResults from '@/pages/student/results/student-results';

@@ -1,8 +1,6 @@
-import { Separator } from '@/components/ui/separator';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import React from 'react';
 import { useOutlet } from 'react-router';
-import StudentContent from './components/student-content';
+import StudentContent from '@/pages/student/components/student-content';
 import Header from '@/components/header';
 
 function Student() {
