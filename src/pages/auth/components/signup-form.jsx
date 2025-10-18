@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import useAuthStore from '@/stores/authStore';
 import { toast } from 'sonner';
-import { FormErrors } from './form-errors';
+import { FormErrors } from '@/components/form-errors';
 import { useState } from 'react';
 
 const signupSchema = z
