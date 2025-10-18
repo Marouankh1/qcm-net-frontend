@@ -22,10 +22,11 @@ export function NavUser() {
     const handleLogOut = async () => {
         try {
             await logoutUser();
-            toast.success('Logged out successfully!');
             navigate('/login');
+            setTimeout(() => {
+                toast.success('Logged out successfully!');
+            }, 1000);
         } catch (error) {
-            console.error('Logout error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Logout failed';
             toast.error(errorMessage);
         }
