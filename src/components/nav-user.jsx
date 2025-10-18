@@ -45,7 +45,7 @@ export function NavUser() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer">
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarFallback className="rounded-lg">{userInitials || 'U'}</AvatarFallback>
                             </Avatar>
@@ -77,7 +77,7 @@ export function NavUser() {
                             <DropdownMenuItem asChild>
                                 <Link
                                     to="/account"
-                                    className="flex items-center gap-2 w-full">
+                                    className="flex items-center gap-2 w-full cursor-pointer">
                                     <BadgeCheck className="h-4 w-4" />
                                     Account
                                 </Link>

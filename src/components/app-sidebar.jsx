@@ -4,6 +4,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
 import useAuthStore from '@/stores/authStore';
+import { Link } from 'react-router';
 
 const navConfig = {
     admin: [
@@ -35,7 +36,9 @@ export function AppSidebar({ ...props }) {
             collapsible="icon"
             {...props}>
             <SidebarHeader>
-                <div className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:px-0">
+                <Link
+                    to="/"
+                    className="flex items-center gap-2 px-2 group-data-[collapsible=icon]:px-0">
                     <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary">
                         <BookOpen className="size-4 text-primary-foreground" />
                     </div>
@@ -43,7 +46,7 @@ export function AppSidebar({ ...props }) {
                         <h1 className="text-sm font-medium text-sidebar-foreground">QCM-Net</h1>
                         <span className="text-xs font-light text-sidebar-foreground/70">Platform of quizzes</span>
                     </div>
-                </div>
+                </Link>
             </SidebarHeader>
 
             <SidebarContent>
