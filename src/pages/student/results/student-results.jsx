@@ -78,6 +78,7 @@ function StudentResults() {
                         <p className="text-muted-foreground">View your quiz attempts and performance</p>
                     </div>
                     <Button
+                        className={'cursor-pointer'}
                         onClick={handleRefresh}
                         variant="outline"
                         size="icon"
@@ -89,18 +90,21 @@ function StudentResults() {
                 {/* Filter Buttons */}
                 <div className="flex gap-2">
                     <Button
+                        className={'cursor-pointer'}
                         variant={filter === 'all' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setFilter('all')}>
                         All Attempts
                     </Button>
                     <Button
+                        className={'cursor-pointer'}
                         variant={filter === 'completed' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setFilter('completed')}>
                         Completed
                     </Button>
                     <Button
+                        className={'cursor-pointer'}
                         variant={filter === 'in-progress' ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setFilter('in-progress')}>
@@ -193,7 +197,7 @@ function StudentResults() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
-                                                            className="gap-2">
+                                                            className="gap-2 cursor-pointer">
                                                             <Eye className="h-4 w-4" />
                                                             Details
                                                         </Button>
@@ -203,7 +207,7 @@ function StudentResults() {
                                                 <Link to={`/student/quiz/${attempt.quiz?.id}/attempt`}>
                                                     <Button
                                                         size="sm"
-                                                        className="gap-2 bg-orange-600 hover:bg-orange-700">
+                                                        className="gap-2 cursor-pointer bg-orange-600 hover:bg-orange-700">
                                                         <Play className="h-4 w-4" />
                                                         Continue Quiz
                                                     </Button>

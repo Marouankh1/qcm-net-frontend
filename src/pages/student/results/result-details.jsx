@@ -53,6 +53,7 @@ function ResultDetails() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button
+                            className={'cursor-pointer'}
                             variant="outline"
                             size="icon"
                             onClick={() => navigate('/student/results')}>
@@ -164,8 +165,13 @@ function ResultDetails() {
 
                 {/* Action Buttons */}
                 <div className="flex gap-3 justify-center">
-                    <Button onClick={() => navigate('/student/quizzes')}>Take Another Quiz</Button>
                     <Button
+                        className={'cursor-pointer'}
+                        onClick={() => navigate('/student/quizzes')}>
+                        Take Another Quiz
+                    </Button>
+                    <Button
+                        className={'cursor-pointer'}
                         variant="outline"
                         onClick={() => navigate('/student/results')}>
                         Back to Results
