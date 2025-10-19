@@ -37,14 +37,14 @@ function QuizAttemptStudent() {
         }
     }, [id]);
 
-    // useEffect(() => {
-    //     if (timeLeft > 0) {
-    //         const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    //         return () => clearTimeout(timer);
-    //     } else {
-    //         handleAutoSubmit();
-    //     }
-    // }, [timeLeft]);
+    useEffect(() => {
+        if (timeLeft > 0) {
+            const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+            return () => clearTimeout(timer);
+        } else {
+            handleAutoSubmit();
+        }
+    }, [timeLeft]);
 
     useEffect(() => {
         if (attempt) {
