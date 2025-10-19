@@ -84,6 +84,7 @@ function StudentResultsPage() {
                 </div>
                 <div className="flex gap-2">
                     <Button
+                        className={'cursor-pointer'}
                         onClick={handleRefresh}
                         variant="outline"
                         size="icon"
@@ -118,13 +119,18 @@ function StudentResultsPage() {
                                 value={selectedQuiz}
                                 onValueChange={handleQuizChange}
                                 disabled={studentsLoading}>
-                                <SelectTrigger className="w-full md:w-[200px]">
+                                <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
                                     <SelectValue placeholder="All quizzes" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All quizzes</SelectItem>
+                                    <SelectItem
+                                        className={'cursor-pointer'}
+                                        value="all">
+                                        All quizzes
+                                    </SelectItem>
                                     {quizzes.map((quiz) => (
                                         <SelectItem
+                                            className={'cursor-pointer'}
                                             key={quiz.id}
                                             value={quiz.id.toString()}>
                                             {quiz.title}
@@ -136,12 +142,14 @@ function StudentResultsPage() {
 
                         <div className="flex gap-2">
                             <Button
+                                className={'cursor-pointer'}
                                 onClick={handleSearch}
                                 disabled={studentsLoading}>
                                 <Search className="h-4 w-4 mr-2" />
                                 {studentsLoading ? 'Searching...' : 'Search'}
                             </Button>
                             <Button
+                                className={'cursor-pointer'}
                                 variant="outline"
                                 onClick={handleClearFilters}
                                 disabled={studentsLoading}>
@@ -263,6 +271,7 @@ function StudentResultsPage() {
 
                                         {/* View Details Button */}
                                         <Button
+                                            className={'cursor-pointer'}
                                             onClick={() => (window.location.href = `/teacher/student-results/${student.id}`)}
                                             variant="outline"
                                             size="sm">

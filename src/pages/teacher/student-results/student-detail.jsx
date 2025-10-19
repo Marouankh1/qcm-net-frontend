@@ -55,7 +55,11 @@ function StudentDetailPage() {
             <div className="p-6">
                 <div className="text-center py-12">
                     <div className="text-red-600 mb-4">Error loading student details</div>
-                    <Button onClick={() => navigate('/teacher/student-results')}>Back to Students</Button>
+                    <Button
+                        className={'cursor-pointer'}
+                        onClick={() => navigate('/teacher/student-results')}>
+                        Back to Students
+                    </Button>
                 </div>
             </div>
         );
@@ -68,6 +72,7 @@ function StudentDetailPage() {
             {/* Header */}
             <div className="flex items-center gap-4">
                 <Button
+                    className={'cursor-pointer'}
                     variant="outline"
                     size="icon"
                     onClick={() => navigate('/teacher/student-results')}>
@@ -163,6 +168,7 @@ function StudentDetailPage() {
                                             {result.final_score}%
                                         </Badge>
                                         <Button
+                                            className={'cursor-pointer'}
                                             variant="outline"
                                             size="sm"
                                             onClick={() => handleViewQuizResults(result.quiz_id)}>

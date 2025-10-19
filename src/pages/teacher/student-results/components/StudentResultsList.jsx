@@ -112,6 +112,7 @@ function StudentResultsList() {
 
                                         {/* Actions */}
                                         <Button
+                                            className={'cursor-pointer'}
                                             onClick={() => navigate(`/teacher/student-results/${student.id}`)}
                                             variant="outline"
                                             size="sm">
