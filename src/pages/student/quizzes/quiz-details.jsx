@@ -11,7 +11,7 @@ import Header from '@/components/header';
 function QuizDetailsStudentPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { currentQuiz, fetchQuizDetails, startQuizAttempt, isLoading } = useStudentStore();
+    const { currentQuiz, fetchQuizDetails, startQuizAttempt, isLoadingQuizDetails } = useStudentStore();
     const [isStarting, setIsStarting] = useState(false);
 
     useEffect(() => {
@@ -46,15 +46,18 @@ function QuizDetailsStudentPage() {
 
     // Redirect if quiz has no questions
     useEffect(() => {
-        if (currentQuiz && currentQuiz.questions.length == 0 && !isLoading) {
+        if (currentQuiz && currentQuiz.questions.length == 0 && !isLoadingQuizDetails) {
             toast.error('This quiz has no questions available.');
             setTimeout(() => {
                 navigate('/student/quizzes');
             }, 2000);
         }
-    }, [currentQuiz, isLoading]);
+    }, [currentQuiz, isLoadingQuizDetails]);
 
-    if (isLoading) {
+    console.log('isLoadingQuizDetails');
+    console.log(isLoadingQuizDetails);
+
+    if (isLoadingQuizDetails) {
         return (
             <div>
                 <Header title="Quiz Details" />
@@ -85,7 +88,7 @@ function QuizDetailsStudentPage() {
     }
 
     // Show redirect message if quiz has no questions
-    if (currentQuiz && currentQuiz.questions.length == 0 && !isLoading) {
+    if (currentQuiz && currentQuiz.questions.length == 0 && !isLoadingQuizDetails) {
         return (
             <div>
                 <Header title="Quiz Details" />
@@ -136,6 +139,7 @@ function QuizDetailsStudentPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         <Button
+                            className={'cursor-pointer'}
                             variant="outline"
                             size="icon"
                             onClick={() => navigate('/student/quizzes')}>
@@ -216,7 +220,7 @@ function QuizDetailsStudentPage() {
                             <Button
                                 size="lg"
                                 onClick={handleStartQuiz}
-                                disabled={isStarting || isLoading || questionCount === 0}
+                                disabled={isStarting || isLoadingQuizDetails || questionCount === 0}
                                 className="gap-2 cursor-pointer">
                                 <Play className="h-5 w-5" />
                                 {isStarting ? 'Starting...' : questionCount === 0 ? 'No Questions Available' : 'Start Quiz'}
