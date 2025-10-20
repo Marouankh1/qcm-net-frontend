@@ -51,7 +51,7 @@ function FormAddQuestion() {
                 }, 2000);
             }
         } catch (error) {
-            console.error('Error checking quiz status:', error);
+            // console.error('Error checking quiz status:', error);
         }
     };
 
@@ -95,7 +95,6 @@ function FormAddQuestion() {
                 setLocalQuestions([createEmptyQuestion()]);
             }
         } catch (error) {
-            console.error('Error loading quiz data:', error);
             toast.error('Failed to load questions');
             // Start with one empty question even if loading fails
             setLocalQuestions([createEmptyQuestion()]);
@@ -322,7 +321,6 @@ function FormAddQuestion() {
                 navigate(`/teacher/quiz/${quizId}`);
             }
         } catch (error) {
-            console.error('Error saving questions:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Failed to save questions';
             toast.error(errorMessage);
         }
@@ -368,6 +366,7 @@ function FormAddQuestion() {
                 </div>
                 <div className="flex gap-2">
                     <Button
+                        className={'cursor-pointer'}
                         onClick={handleRefresh}
                         variant="outline"
                         size="icon"
@@ -416,7 +415,7 @@ function FormAddQuestion() {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => removeQuestion(question.id)}
-                                                        className="h-8 w-8 text-destructive hover:text-destructive"
+                                                        className="h-8 w-8 text-destructive hover:text-destructive cursor-pointer"
                                                         disabled={isLoading}>
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -478,7 +477,7 @@ function FormAddQuestion() {
                                                         variant="ghost"
                                                         size="icon"
                                                         onClick={() => removeAnswer(question.id, answer.id)}
-                                                        className="h-8 w-8 text-destructive hover:text-destructive shrink-0"
+                                                        className="h-8 w-8 text-destructive hover:text-destructive shrink-0 cursor-pointer"
                                                         disabled={isLoading}>
                                                         <Trash2 className="h-4 w-4" />
                                                     </Button>
@@ -513,6 +512,7 @@ function FormAddQuestion() {
 
                 <div className="flex gap-3 justify-end border-t pt-6 mt-6">
                     <Button
+                        className={'cursor-pointer'}
                         type="button"
                         variant="outline"
                         onClick={() => navigate(`/quiz/${quizId}`)}
@@ -520,6 +520,7 @@ function FormAddQuestion() {
                         Cancel
                     </Button>
                     <Button
+                        className={'cursor-pointer'}
                         type="submit"
                         disabled={isLoading}>
                         {isLoading ? 'Saving...' : 'Save Questions'}

@@ -37,11 +37,9 @@ export function useQuizDetails(quizStore) {
                 // navigate(`/student/attempt/${attemptId}`);
                 navigate(`/student/quiz/${currentQuiz.id}/attempt`);
             } else {
-                console.error('No attempt ID returned from API:', attempt);
                 toast.error('Failed to start quiz - no attempt ID received');
             }
         } catch (error) {
-            console.error('Failed to start quiz:', error);
             toast.error('Failed to start quiz');
         } finally {
             setIsStarting(false);

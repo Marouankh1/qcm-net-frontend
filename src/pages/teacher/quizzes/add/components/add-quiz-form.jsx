@@ -57,7 +57,6 @@ function AddQuizForm() {
                 navigate('/teacher/quizzes');
             }
         } catch (error) {
-            console.error('Error creating quiz:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Failed to create quiz';
             toast.error(errorMessage);
         }

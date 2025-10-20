@@ -21,7 +21,7 @@ export default function QuizDetailsPage() {
     const { id: quizId } = useParams();
     const navigate = useNavigate();
 
-    const { currentQuiz, fetchQuiz, updateQuiz, isLoading: quizLoading } = useQuizStore();
+    const { currentQuiz, fetchQuiz, isLoading: quizLoading } = useQuizStore();
 
     const {
         getQuestionsByQuiz,
@@ -90,90 +90,8 @@ export default function QuizDetailsPage() {
                 setOriginalQuestions(JSON.parse(JSON.stringify(formattedQuestions)));
             }
         } catch (error) {
-            console.error('Error loading quiz data:', error);
             toast.error('Failed to load quiz data');
         }
-    };
-
-    const handleLogOut = () => {
-        console.log('[v0] Logout clicked');
-    };
-
-    const handleEditQuiz = () => {
-        setIsEditing(true);
-    };
-
-    const handleCancelEditQuiz = () => {
-        setQuizData(originalQuizData);
-        setIsEditing(false);
-    };
-
-    const handleSaveQuiz = async () => {
-        try {
-            await updateQuiz(parseInt(quizId), quizData);
-            setOriginalQuizData(quizData);
-            setIsEditing(false);
-            toast.success('Quiz updated successfully!');
-        } catch (error) {
-            console.error('Error updating quiz:', error);
-            toast.error('Failed to update quiz');
-        }
-    };
-
-    const handleEditQuestions = () => {
-        setIsEditingQuestions(true);
-    };
-
-    const handleCancelEditQuestions = () => {
-        setQuestions(JSON.parse(JSON.stringify(originalQuestions)));
-        setIsEditingQuestions(false);
-    };
-
-    const handleSaveQuestions = async () => {
-        try {
-            // Here you would implement the update questions logic
-            // For now, just save locally
-            setOriginalQuestions(JSON.parse(JSON.stringify(questions)));
-            setIsEditingQuestions(false);
-            toast.success('Questions updated successfully!');
-        } catch (error) {
-            console.error('Error updating questions:', error);
-            toast.error('Failed to update questions');
-        }
-    };
-
-    const updateQuestion = (questionId, text) => {
-        setQuestions(questions.map((q) => (q.id === questionId ? { ...q, text } : q)));
-    };
-
-    const updateAnswer = (questionId, answerId, text) => {
-        setQuestions(
-            questions.map((q) =>
-                q.id === questionId
-                    ? {
-                          ...q,
-                          answers: q.answers.map((a) => (a.id === answerId ? { ...a, text } : a)),
-                      }
-                    : q
-            )
-        );
-    };
-
-    const toggleCorrectAnswer = (questionId, answerId) => {
-        setQuestions(
-            questions.map((q) =>
-                q.id === questionId
-                    ? {
-                          ...q,
-                          answers: q.answers.map((a) => (a.id === answerId ? { ...a, isCorrect: !a.isCorrect } : a)),
-                      }
-                    : q
-            )
-        );
-    };
-
-    const updateQuizField = (field, value) => {
-        setQuizData((prev) => ({ ...prev, [field]: value }));
     };
 
     return (

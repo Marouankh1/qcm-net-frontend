@@ -30,7 +30,6 @@ function StudentResultsPage() {
             await fetchQuizzes();
             await fetchStudentsStats(); // Charger les étudiants sans filtres
         } catch (error) {
-            console.error('Error loading initial data:', error);
             toast.error('Failed to load data');
         }
     };
@@ -47,10 +46,8 @@ function StudentResultsPage() {
                 searchParams.quiz_id = selectedQuiz;
             }
 
-            console.log('Search params:', searchParams); // Debug
             await fetchStudentsStats(searchParams);
         } catch (error) {
-            console.error('Search error:', error);
             toast.error('Failed to search students');
         }
     };
@@ -68,11 +65,6 @@ function StudentResultsPage() {
     const handleQuizChange = (value) => {
         setSelectedQuiz(value);
     };
-
-    // Debug: Vérifier l'état
-    console.log('Students loading:', studentsLoading);
-    console.log('Students data:', students);
-    console.log('Students error:', studentsError);
 
     return (
         <div className="p-6 space-y-6">

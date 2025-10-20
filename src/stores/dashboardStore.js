@@ -36,7 +36,6 @@ const useDashboardStore = create((set, get) => ({
                 throw new Error(response.data.message || 'Failed to fetch stats');
             }
         } catch (error) {
-            console.error('Error fetching dashboard stats:', error);
             set({
                 error: error.response?.data?.message || error.message,
                 isLoading: false,

@@ -53,10 +53,8 @@ const useStudentResultsStore = create((set, get) => ({
             }
 
             const url = `/student-results?${params.toString()}`;
-            console.log('🔍 API URL:', url); // Debug
 
             const response = await api.get(url);
-            console.log('✅ API Response:', response.data); // Debug
 
             if (response.data.success) {
                 set({
@@ -71,7 +69,6 @@ const useStudentResultsStore = create((set, get) => ({
                 throw new Error(response.data.message || 'Failed to fetch students stats');
             }
         } catch (error) {
-            console.error('❌ Error in fetchStudentsStats:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Unknown error';
 
             set({
@@ -101,7 +98,6 @@ const useStudentResultsStore = create((set, get) => ({
                 throw new Error(response.data.message || 'Failed to fetch student detail');
             }
         } catch (error) {
-            console.error('Error fetching student detail:', error);
             set({
                 studentDetailError: error.response?.data?.message || error.message,
                 studentDetailLoading: false,
@@ -129,7 +125,6 @@ const useStudentResultsStore = create((set, get) => ({
                 throw new Error(response.data.message || 'Failed to fetch quiz stats');
             }
         } catch (error) {
-            console.error('Error fetching quiz stats:', error);
             set({
                 quizStatsError: error.response?.data?.message || error.message,
                 quizStatsLoading: false,
@@ -157,7 +152,6 @@ const useStudentResultsStore = create((set, get) => ({
                 throw new Error(response.data.message || 'Failed to fetch quiz results');
             }
         } catch (error) {
-            console.error('Error fetching quiz results:', error);
             set({
                 quizResultsError: error.response?.data?.message || error.message,
                 quizResultsLoading: false,

@@ -36,7 +36,6 @@ function QuizDetails() {
     const [originalQuizData, setOriginalQuizData] = useState(null);
     const [originalQuestions, setOriginalQuestions] = useState([]);
 
-    // Load quiz data
     useEffect(() => {
         if (quizId) {
             loadQuizData();
@@ -49,7 +48,6 @@ function QuizDetails() {
             await fetchQuestionsByQuiz(quizId);
             await fetchAllChoices();
 
-            // Update local state with quiz data
             if (currentQuiz) {
                 const quizData = {
                     title: currentQuiz.title || '',
@@ -59,12 +57,10 @@ function QuizDetails() {
                 setOriginalQuizData(quizData);
             }
 
-            // Update local state with questions
             const existingQuestions = getQuestionsByQuiz(parseInt(quizId));
             if (existingQuestions.length > 0) {
                 const formattedQuestions = existingQuestions.map((q) => {
                     const choices = getChoicesByQuestion(q.id);
-                    // Find the correct answer for radio button
                     const correctAnswer = choices.find((c) => c.is_correct);
                     return {
                         id: q.id.toString(),
@@ -82,23 +78,32 @@ function QuizDetails() {
                 setOriginalQuestions(JSON.parse(JSON.stringify(formattedQuestions)));
             }
         } catch (error) {
-            console.error('Error loading quiz data:', error);
             toast.error('Failed to load quiz data');
         }
     };
+
+    useEffect(() => {
+        if (currentQuiz && !originalQuizData) {
+            const quizData = {
+                title: currentQuiz.title || '',
+                description: currentQuiz.description || '',
+            };
+            setQuizData(quizData);
+            setOriginalQuizData(quizData);
+        }
+    }, [currentQuiz, originalQuizData]);
 
     const handleEditQuiz = () => {
         setIsEditing(true);
     };
 
     const handleCancelEditQuiz = () => {
-        setQuizData(originalQuizData);
+        setQuizData(originalQuizData || { title: '', description: '' });
         setIsEditing(false);
     };
 
     const handleSaveQuiz = async () => {
         try {
-            // Only send title and description in the request
             const updateData = {
                 title: quizData.title,
                 description: quizData.description,
@@ -109,7 +114,6 @@ function QuizDetails() {
             setIsEditing(false);
             toast.success('Quiz updated successfully!');
         } catch (error) {
-            console.error('Error updating quiz:', error);
             toast.error('Failed to update quiz');
         }
     };
@@ -125,13 +129,10 @@ function QuizDetails() {
 
     const handleSaveQuestions = async () => {
         try {
-            // Here you would implement the update questions logic
-            // For now, just save locally
             setOriginalQuestions(JSON.parse(JSON.stringify(questions)));
             setIsEditingQuestions(false);
             toast.success('Questions updated successfully!');
         } catch (error) {
-            console.error('Error updating questions:', error);
             toast.error('Failed to update questions');
         }
     };
@@ -180,14 +181,12 @@ function QuizDetails() {
             await publishQuiz(parseInt(quizId), newPublishStatus);
             toast.success(`Quiz ${newPublishStatus ? 'published' : 'unpublished'} successfully!`);
         } catch (error) {
-            console.error('Error updating publish status:', error);
             toast.error('Failed to update publish status');
         }
     };
 
     const isLoading = quizLoading || questionLoading;
 
-    // Check if quiz is published
     const isPublished = currentQuiz?.is_published;
 
     if (isLoading) {
@@ -201,9 +200,24 @@ function QuizDetails() {
         );
     }
 
+    if (!currentQuiz && !isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="text-center">
+                    <p className="text-muted-foreground">Quiz not found</p>
+                    <Button
+                        variant="outline"
+                        className="mt-4 cursor-pointer"
+                        onClick={() => navigate('/teacher/quizzes')}>
+                        Back to Quizzes
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-6 w-full">
-            {/* Quiz Header */}
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-3xl font-bold tracking-tight">{currentQuiz?.title || 'Quiz Details'}</h2>
@@ -224,7 +238,6 @@ function QuizDetails() {
                 </div>
             </div>
 
-            {/* Quiz Information Card */}
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
@@ -266,7 +279,7 @@ function QuizDetails() {
                         <Input
                             id="title"
                             placeholder="e.g., Network Protocols Fundamentals"
-                            value={quizData.title}
+                            value={quizData.title || ''}
                             onChange={(e) => updateQuizField('title', e.target.value)}
                             disabled={!isEditing || isPublished}
                         />
@@ -278,13 +291,12 @@ function QuizDetails() {
                             id="description"
                             placeholder="Provide a brief description of what this quiz covers..."
                             rows={3}
-                            value={quizData.description}
+                            value={quizData.description || ''}
                             onChange={(e) => updateQuizField('description', e.target.value)}
                             disabled={!isEditing || isPublished}
                         />
                     </div>
 
-                    {/* Quiz Metadata (Read-only) */}
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                         <div>
                             <Label className="text-sm text-muted-foreground">Status</Label>
@@ -306,7 +318,6 @@ function QuizDetails() {
                 </CardContent>
             </Card>
 
-            {/* Questions Section */}
             <Card>
                 <CardHeader>
                     <div className="flex items-center justify-between">
@@ -425,7 +436,6 @@ function QuizDetails() {
                 </CardContent>
             </Card>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 justify-end border-t pt-6">
                 <Button
                     variant="outline"

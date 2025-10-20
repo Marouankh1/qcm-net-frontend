@@ -30,7 +30,7 @@ function QuizzesList() {
             const filters = searchTerm ? { search: searchTerm } : {};
             await fetchQuizzes(filters);
         } catch (error) {
-            console.error('Error loading quizzes:', error);
+            // console.error('Error loading quizzes:', error);
             // Error is handled in the store and will be displayed
         }
     };
@@ -49,7 +49,6 @@ function QuizzesList() {
             await deleteQuiz(quizId);
             toast.success('Quiz deleted successfully!');
         } catch (error) {
-            console.error('Error deleting quiz:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Failed to delete quiz';
             toast.error(errorMessage);
         }
@@ -238,7 +237,11 @@ function QuizzesList() {
                                 </CardContent>
                                 <CardFooter className="text-xs text-muted-foreground border-t pt-4">
                                     Created {formatDistanceToNow(new Date(quiz.created_at))} ago
-                                    {quiz.is_published && <span className="ml-2 text-green-600 font-medium">• Published</span>}
+                                    {quiz.is_published ? (
+                                        <span className="ml-2 text-green-600 font-medium">• Published</span>
+                                    ) : (
+                                        <span className="ml-2 text-red-600 font-medium">• Not Published</span>
+                                    )}
                                 </CardFooter>
                             </Card>
                         ))}

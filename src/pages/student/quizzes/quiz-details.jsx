@@ -54,9 +54,6 @@ function QuizDetailsStudentPage() {
         }
     }, [currentQuiz, isLoadingQuizDetails]);
 
-    console.log('isLoadingQuizDetails');
-    console.log(isLoadingQuizDetails);
-
     if (isLoadingQuizDetails) {
         return (
             <div>

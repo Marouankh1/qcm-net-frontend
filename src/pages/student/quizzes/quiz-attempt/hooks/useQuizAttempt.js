@@ -23,7 +23,6 @@ export const useQuizAttempt = () => {
             const attemptData = await startQuizAttempt(id);
             setAttempt(attemptData);
         } catch (error) {
-            console.error('Error loading quiz and attempt:', error);
             toast.error('Failed to load quiz');
             navigate('/student/quizzes');
         }
@@ -39,7 +38,7 @@ export const useQuizAttempt = () => {
                     answersHandler(response.data.data);
                 }
             } catch (error) {
-                console.error('Error loading existing answers:', error);
+                // console.error('Error loading existing answers:', error);
             }
         },
         [attempt]
@@ -61,7 +60,6 @@ export const useQuizAttempt = () => {
             toast.success('Quiz submitted successfully!');
             navigate('/student/results');
         } catch (error) {
-            console.error('Submit quiz error:', error);
             const errorMessage = error.response?.data?.message || error.message || 'Failed to submit quiz';
             toast.error(errorMessage);
         } finally {
@@ -82,7 +80,6 @@ export const useQuizAttempt = () => {
             toast.success("Time's up! Quiz submitted automatically.");
             navigate('/student/results');
         } catch (error) {
-            console.error('Auto submit error:', error);
             toast.error('Failed to submit quiz automatically');
         } finally {
             setIsSubmitting(false);
