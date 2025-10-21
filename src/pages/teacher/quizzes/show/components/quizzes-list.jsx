@@ -213,7 +213,7 @@ function QuizzesList() {
                                                     asChild>
                                                     <button
                                                         className="flex items-center gap-2 w-full text-left cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-none bg-transparent p-2"
-                                                        disabled={isLoading}
+                                                        disabled={isLoading || quiz.participants_count > 0}
                                                         onClick={() => handleDeleteQuiz(quiz.id)}>
                                                         <Trash2 className="h-4 w-4" />
                                                         {isLoading ? 'Deleting...' : 'Delete'}
