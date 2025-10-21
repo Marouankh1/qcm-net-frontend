@@ -30,15 +30,9 @@ function StudentContent() {
 
     useEffect(() => {
         if (myAttempts.length > 0) {
-            console.log('myAttempts');
-            console.log(myAttempts);
             const completed = myAttempts.filter((attempt) => attempt.completed_at);
             const scores = completed.map((attempt) => parseFloat(attempt.final_score) || 0);
-            console.log('scores');
-            console.log(scores);
             const average = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
-            console.log('average');
-            console.log(average);
             const best = Math.max(...scores, 0);
 
             setStats({
@@ -116,8 +110,6 @@ function StudentContent() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        {console.log('stats')}
-                        {console.log(stats)}
                         {isLoading ? (
                             <Skeleton className="h-8 w-16 mb-1" />
                         ) : (
