@@ -232,7 +232,7 @@ function StudentResults() {
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {Math.round(
-                                        filteredAttempts.reduce((sum, attempt) => sum + attempt.final_score, 0) /
+                                        filteredAttempts.reduce((sum, attempt) => sum + parseFloat(attempt.final_score), 0) /
                                             filteredAttempts.length
                                     )}
                                     %
