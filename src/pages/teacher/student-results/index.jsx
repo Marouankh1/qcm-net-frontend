@@ -10,6 +10,7 @@ import { Search, Users, BarChart3, RefreshCw } from 'lucide-react';
 import useStudentResultsStore from '@/stores/studentResultsStore';
 import useQuizStore from '@/stores/quizStore';
 import { toast } from 'sonner';
+import { Link } from 'react-router';
 
 function StudentResultsPage() {
     const { students, studentsLoading, studentsError, fetchStudentsStats, clearErrors } = useStudentResultsStore();
@@ -262,13 +263,14 @@ function StudentResultsPage() {
                                         </div>
 
                                         {/* View Details Button */}
-                                        <Button
-                                            className={'cursor-pointer'}
-                                            onClick={() => (window.location.href = `/teacher/student-results/${student.id}`)}
-                                            variant="outline"
-                                            size="sm">
-                                            View Details
-                                        </Button>
+                                        <Link to={`/teacher/student-results/${student.id}`}>
+                                            <Button
+                                                className={'cursor-pointer'}
+                                                variant="outline"
+                                                size="sm">
+                                                View Details
+                                            </Button>
+                                        </Link>
                                     </div>
                                 </div>
                             </CardContent>
