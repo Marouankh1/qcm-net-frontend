@@ -515,7 +515,7 @@ function FormAddQuestion() {
                         className={'cursor-pointer'}
                         type="button"
                         variant="outline"
-                        onClick={() => navigate(`/quiz/${quizId}`)}
+                        onClick={() => navigate(`/teacher/quiz/${quizId}`)}
                         disabled={isLoading}>
                         Cancel
                     </Button>
